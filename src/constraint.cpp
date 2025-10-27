@@ -5,16 +5,7 @@
 
 namespace arc_consistency
 {
-    bool constraint::remove(utils::var v, const utils::enum_val &val) noexcept
-    {
-        assert(v < slv.vars.size());
-        assert(slv.vars[v].dom.find(const_cast<utils::enum_val *>(&val)) != slv.vars[v].dom.end());
-        slv.vars[v].dom.erase(const_cast<utils::enum_val *>(&val));
-        if (slv.vars[v].dom.empty())
-            return false;
-        slv.enqueue(v);
-        return true;
-    }
+    bool constraint::remove(utils::var v, const utils::enum_val &val) noexcept { return slv.remove(v, val); }
 
     clause::clause(solver &slv, std::vector<utils::lit> &&lits) noexcept : constraint(slv), lits{std::move(lits)} {}
 

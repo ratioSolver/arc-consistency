@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bool.hpp"
 #include "enum.hpp"
 #include "lit.hpp"
 #include <vector>
