@@ -1,0 +1,6 @@
+add_executable(deltacsp_lib_tests test_deltacsp.cpp)
+add_dependencies(deltacsp_lib_tests DeltaCSP)
+target_link_libraries(deltacsp_lib_tests PRIVATE DeltaCSP)
+setup_sanitizers(deltacsp_lib_tests)
+
+add_test(NAME DeltaCSP_LibTest COMMAND deltacsp_lib_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
