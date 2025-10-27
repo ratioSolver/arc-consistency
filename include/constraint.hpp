@@ -1,5 +1,6 @@
 #pragma once
 
+#include "enum.hpp"
 #include "lit.hpp"
 #include <vector>
 
@@ -17,6 +18,9 @@ namespace arc_consistency
     virtual bool propagate(utils::var v) noexcept = 0;
 
     virtual std::string to_string() const noexcept = 0;
+
+  protected:
+    bool remove(utils::var v, const utils::enum_val &val) noexcept;
 
   protected:
     solver &slv;

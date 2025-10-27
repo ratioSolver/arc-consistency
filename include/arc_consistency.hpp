@@ -10,12 +10,19 @@ namespace arc_consistency
 {
   class solver
   {
+    friend class constraint;
+
   public:
     [[nodiscard]] utils::var new_sat() noexcept;
     [[nodiscard]] utils::var new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept;
 
+    const std::vector<std::reference_wrapper<utils::enum_val>> domain(utils::var v) const noexcept;
+
     void add_constraint(const std::shared_ptr<constraint> &c) noexcept;
     void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
+
+  private:
+    void enqueue(utils::var v) noexcept;
 
   private:
     std::vector<var> vars;                                       // index is the variable id

@@ -1,9 +1,21 @@
 #include "constraint.hpp"
+#include "arc_consistency.hpp"
 #include <unordered_set>
 #include <cassert>
 
 namespace arc_consistency
 {
+    bool constraint::remove(utils::var v, const utils::enum_val &val) noexcept
+    {
+        assert(v < slv.vars.size());
+        assert(slv.vars[v].dom.find(const_cast<utils::enum_val *>(&val)) != slv.vars[v].dom.end());
+        slv.vars[v].dom.erase(const_cast<utils::enum_val *>(&val));
+        if (slv.vars[v].dom.empty())
+            return false;
+        slv.enqueue(v);
+        return true;
+    }
+
     clause::clause(solver &slv, std::vector<utils::lit> &&lits) noexcept : constraint(slv), lits{std::move(lits)} {}
 
     std::vector<utils::var> clause::get_scope() const noexcept
@@ -12,6 +24,35 @@ namespace arc_consistency
         for (const auto &l : lits)
             scope.push_back(utils::variable(l));
         return scope;
+    }
+
+    bool clause::propagate(utils::var v) noexcept
+    {
+        std::size_t unassigned_count = 0;
+        utils::lit unassigned_lit;
+        for (const auto &l : lits)
+        {
+            const auto var = utils::variable(l);
+            const auto &var_dom = slv.domain(var);
+            if (var_dom.size() == 1)
+            {
+                const auto &val = var_dom.begin()->get();
+                if ((utils::sign(l) && &val == &bool_val::True) || (!utils::sign(l) && &val == &bool_val::False))
+                    return false; // Clause is satisfied
+            }
+            else if (unassigned_count > 1)
+                return true; // More than one unassigned literal, nothing to do
+            else
+            {
+                ++unassigned_count;
+                unassigned_lit = l;
+            }
+        }
+        if (unassigned_count == 1)
+            remove(utils::variable(unassigned_lit), utils::sign(unassigned_lit) ? static_cast<const utils::enum_val &>(bool_val::False) : static_cast<const utils::enum_val &>(bool_val::True));
+        else if (unassigned_count == 0)
+            return false; // Clause is unsatisfied
+        return true;
     }
 
     std::string clause::to_string() const noexcept

@@ -30,9 +30,12 @@ namespace arc_consistency
     bool value;
   };
 
+  class constraint;
+
   class var
   {
     friend class solver;
+    friend class constraint;
 
   public:
     var(const std::unordered_set<utils::enum_val *> &&init_dom) noexcept;

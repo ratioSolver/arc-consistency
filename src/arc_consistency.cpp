@@ -20,6 +20,14 @@ namespace arc_consistency
         return x;
     }
 
+    const std::vector<std::reference_wrapper<utils::enum_val>> solver::domain(utils::var v) const noexcept
+    {
+        std::vector<std::reference_wrapper<utils::enum_val>> dom_vec;
+        for (auto *ev_ptr : vars[v].dom)
+            dom_vec.emplace_back(*ev_ptr);
+        return dom_vec;
+    }
+
     void solver::add_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
         for (const auto &v : c->get_scope())
