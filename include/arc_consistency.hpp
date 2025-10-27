@@ -51,6 +51,7 @@ namespace arc_consistency
     void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
 
     [[nodiscard]] bool assign(utils::var v, const utils::enum_val &val) noexcept;
+    [[nodiscard]] bool forbid(utils::var v, const utils::enum_val &val) noexcept;
 
     [[nodiscard]] bool propagate() noexcept;
 

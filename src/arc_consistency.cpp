@@ -61,6 +61,22 @@ namespace arc_consistency
 
     void solver::remove_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
+        std::unordered_set<utils::var> visited;
+        std::queue<std::shared_ptr<constraint>> to_restore;
+        to_restore.push(c);
+        while (!to_restore.empty())
+        {
+            const auto curr = to_restore.front();
+            to_restore.pop();
+            for (const auto &v : curr->scope())
+                if (visited.insert(v).second)
+                {
+                    dom.at(v) = init_domain.at(v);
+                    to_propagate.push(v);
+                    for (const auto &c : watchlist.at(v))
+                        to_restore.push(c);
+                }
+        }
         for (const auto &v : c->scope())
             watchlist.at(v).erase(c);
         constraints.erase(c);
@@ -79,6 +95,16 @@ namespace arc_consistency
         }
         LOG_TRACE(to_string(*this, v));
         to_propagate.push(v);
+        return propagate();
+    }
+
+    bool solver::forbid(utils::var v, const utils::enum_val &val) noexcept
+    {
+        assert(dom.at(v).find(const_cast<utils::enum_val *>(&val)) != dom.at(v).end());
+        LOG_TRACE("v" + std::to_string(v) + " != " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"));
+        if (!remove(v, const_cast<utils::enum_val &>(val)))
+            return false;
+        LOG_TRACE(to_string(*this, v));
         return propagate();
     }
 

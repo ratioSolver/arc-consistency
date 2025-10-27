@@ -83,10 +83,11 @@ namespace arc_consistency
     {
         auto &var_dom = domain(v);
         auto other_var = (v == var1) ? var2 : var1;
+        auto &other_dom = domain(other_var);
         if (var_dom.size() == 1)
         {
             auto sole_val = *var_dom.begin();
-            if (!remove(other_var, *sole_val))
+            if (other_dom.find(sole_val) != other_dom.end() && !remove(other_var, *sole_val))
                 return false; // Domain wipeout
         }
         return true;
