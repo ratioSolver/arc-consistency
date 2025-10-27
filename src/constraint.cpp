@@ -17,7 +17,7 @@ namespace arc_consistency
         return scope;
     }
 
-    bool clause::propagate(utils::var v) noexcept
+    bool clause::propagate(utils::var) noexcept
     {
         std::size_t unassigned_count = 0;
         utils::lit unassigned_lit;
@@ -31,16 +31,15 @@ namespace arc_consistency
                 if ((utils::sign(l) && &val == &bool_val::True) || (!utils::sign(l) && &val == &bool_val::False))
                     return false; // Clause is satisfied
             }
-            else if (unassigned_count > 1)
-                return true; // More than one unassigned literal, nothing to do
             else
             {
-                ++unassigned_count;
+                if (++unassigned_count > 1)
+                    return true; // More than one unassigned literal, nothing to do
                 unassigned_lit = l;
             }
         }
         if (unassigned_count == 1)
-            remove(utils::variable(unassigned_lit), utils::sign(unassigned_lit) ? static_cast<const utils::enum_val &>(bool_val::False) : static_cast<const utils::enum_val &>(bool_val::True));
+            remove(utils::variable(unassigned_lit), utils::sign(unassigned_lit) ? bool_val::False : bool_val::True);
         else if (unassigned_count == 0)
             return false; // Clause is unsatisfied
         return true;
