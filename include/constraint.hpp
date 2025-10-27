@@ -13,6 +13,7 @@ namespace arc_consistency
     constraint(solver &slv) noexcept : slv(slv) {}
     virtual ~constraint() = default;
 
+    virtual std::vector<utils::var> get_scope() const noexcept = 0;
     virtual bool propagate(utils::var v) noexcept = 0;
 
     virtual std::string to_string() const noexcept = 0;
@@ -26,6 +27,7 @@ namespace arc_consistency
   public:
     clause(solver &slv, std::vector<utils::lit> &&lits) noexcept;
 
+    std::vector<utils::var> get_scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
 
     std::string to_string() const noexcept override;
@@ -39,6 +41,7 @@ namespace arc_consistency
   public:
     eq(solver &slv, utils::var var1, utils::var var2) noexcept;
 
+    std::vector<utils::var> get_scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
 
     std::string to_string() const noexcept override;
@@ -53,6 +56,7 @@ namespace arc_consistency
   public:
     neq(solver &slv, utils::var var1, utils::var var2) noexcept;
 
+    std::vector<utils::var> get_scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
 
     std::string to_string() const noexcept override;

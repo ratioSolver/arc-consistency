@@ -4,16 +4,16 @@
 
 namespace arc_consistency
 {
-    const bool_val bool_val::True{true};
-    const bool_val bool_val::False{false};
+    bool_val bool_val::True{true};
+    bool_val bool_val::False{false};
 
-    var::var(const std::unordered_set<const utils::enum_val *> &&init_dom) noexcept : init_domain(init_dom), dom(std::move(init_dom)) {}
+    var::var(const std::unordered_set<utils::enum_val *> &&init_dom) noexcept : init_domain(init_dom), dom(std::move(init_dom)) {}
 
     std::string to_string(const var &x) noexcept
     {
         if (x.dom.empty())
             return "∅";
-        else if (std::all_of(x.init_domain.begin(), x.init_domain.end(), [&x](const utils::enum_val *v)
+        else if (std::all_of(x.init_domain.begin(), x.init_domain.end(), [&x](utils::enum_val *v)
                              { return dynamic_cast<const enum_val *>(v); }))
         {
             if (x.dom.size() == 1)

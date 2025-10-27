@@ -17,8 +17,8 @@ namespace arc_consistency
   class bool_val : public enum_val
   {
   public:
-    static const bool_val True;
-    static const bool_val False;
+    static bool_val True;
+    static bool_val False;
 
     bool_val(bool v) : value(v) {}
 
@@ -35,13 +35,13 @@ namespace arc_consistency
     friend class solver;
 
   public:
-    var(const std::unordered_set<const utils::enum_val *> &&init_dom) noexcept;
+    var(const std::unordered_set<utils::enum_val *> &&init_dom) noexcept;
 
     friend std::string to_string(const var &x) noexcept;
 
   private:
-    std::unordered_set<const utils::enum_val *> init_domain; // The initial domain..
-    std::unordered_set<const utils::enum_val *> dom;         // The current domain..
+    std::unordered_set<utils::enum_val *> init_domain; // The initial domain..
+    std::unordered_set<utils::enum_val *> dom;         // The current domain..
   };
 
   [[nodiscard]] std::string to_string(const var &x) noexcept;
