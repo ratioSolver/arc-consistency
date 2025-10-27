@@ -44,6 +44,7 @@ namespace arc_consistency
     [[nodiscard]] utils::var new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept;
 
     [[nodiscard]] utils::lbool sat_val(const utils::var &x) const noexcept;
+    [[nodiscard]] utils::lbool sat_val(const utils::lit &l) const noexcept;
     [[nodiscard]] const std::vector<std::reference_wrapper<utils::enum_val>> domain(utils::var v) const noexcept;
 
     void add_constraint(const std::shared_ptr<constraint> &c) noexcept;

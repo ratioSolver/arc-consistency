@@ -28,6 +28,19 @@ namespace arc_consistency
             return utils::Undefined; // variable is unassigned
     }
 
+    utils::lbool solver::sat_val(const utils::lit &l) const noexcept
+    {
+        switch (sat_val(utils::variable(l)))
+        {
+        case utils::True:
+            return utils::sign(l) ? utils::True : utils::False;
+        case utils::False:
+            return utils::sign(l) ? utils::False : utils::True;
+        default:
+            return utils::Undefined;
+        }
+    }
+
     const std::vector<std::reference_wrapper<utils::enum_val>> solver::domain(utils::var v) const noexcept
     {
         std::vector<std::reference_wrapper<utils::enum_val>> dom_vec;
@@ -93,7 +106,7 @@ namespace arc_consistency
 
     std::string to_string(const solver &s) noexcept
     {
-        std::string res;
+        std::string res = "Solver State:\n";
         for (std::size_t i = 0; i < s.dom.size(); ++i)
         {
             res += "v" + std::to_string(i);
@@ -115,6 +128,7 @@ namespace arc_consistency
                 }
             }
         }
+        res += "Constraints:\n";
         for (const auto &c : s.constraints)
             res += c->to_string() + "\n";
         return res;

@@ -27,7 +27,7 @@ namespace arc_consistency
         std::size_t unassigned_count = 0;
         utils::lit unassigned_lit;
         for (const auto &l : lits)
-            switch (slv.sat_val(utils::variable(l)))
+            switch (slv.sat_val(l))
             {
             case utils::True:
                 return true; // Clause is already satisfied
