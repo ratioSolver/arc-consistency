@@ -22,7 +22,7 @@ namespace arc_consistency
     virtual std::string to_string() const noexcept = 0;
 
   protected:
-    [[nodiscard]] bool remove(utils::var v, const utils::enum_val &val) noexcept;
+    [[nodiscard]] bool remove(utils::var v, utils::enum_val &val) noexcept;
     [[nodiscard]] std::unordered_set<utils::enum_val *> &domain(utils::var v) const noexcept;
 
   protected:

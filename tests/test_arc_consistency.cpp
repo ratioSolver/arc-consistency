@@ -20,6 +20,11 @@ void test0()
     const auto v2 = s.new_sat();
     auto c1 = std::make_shared<arc_consistency::clause>(s, std::vector<utils::lit>{{v1, true}, {v2, false}});
     s.add_constraint(c1);
+    auto prop = s.propagate();
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+    prop = s.assign(v1, arc_consistency::solver::False);
+    assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
 }
 

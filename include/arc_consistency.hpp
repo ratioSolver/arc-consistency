@@ -49,17 +49,20 @@ namespace arc_consistency
     void add_constraint(const std::shared_ptr<constraint> &c) noexcept;
     void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
 
+    [[nodiscard]] bool assign(utils::var v, const utils::enum_val &val) noexcept;
+
     [[nodiscard]] bool propagate() noexcept;
 
     friend std::string to_string(const solver &s) noexcept;
 
   private:
-    [[nodiscard]] bool remove(utils::var v, const utils::enum_val &val) noexcept;
+    [[nodiscard]] bool remove(utils::var v, utils::enum_val &val) noexcept;
 
   private:
     std::vector<std::unordered_set<utils::enum_val *>> init_domain;         // initial domains
     std::vector<std::unordered_set<utils::enum_val *>> dom;                 // current domains
     std::vector<std::unordered_set<std::shared_ptr<constraint>>> watchlist; // watchlist for each variable
+    std::unordered_set<std::shared_ptr<constraint>> constraints;            // all constraints
     std::queue<utils::var> to_propagate;                                    // variables to propagate
   };
 

@@ -5,7 +5,7 @@
 
 namespace arc_consistency
 {
-    bool constraint::remove(utils::var v, const utils::enum_val &val) noexcept { return slv.remove(v, val); }
+    bool constraint::remove(utils::var v, utils::enum_val &val) noexcept { return slv.remove(v, val); }
     std::unordered_set<utils::enum_val *> &constraint::domain(utils::var v) const noexcept
     {
         assert(v < slv.dom.size());
@@ -30,7 +30,7 @@ namespace arc_consistency
             switch (slv.sat_val(utils::variable(l)))
             {
             case utils::True:
-                return false; // Clause is satisfied
+                return true; // Clause is already satisfied
             case utils::False:
                 break; // Literal is false, continue
             case utils::Undefined:

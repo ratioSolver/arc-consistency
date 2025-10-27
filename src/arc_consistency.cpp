@@ -1,4 +1,5 @@
 #include "arc_consistency.hpp"
+#include "logging.hpp"
 #include <cassert>
 
 namespace arc_consistency
@@ -38,13 +39,33 @@ namespace arc_consistency
     void solver::add_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
         for (const auto &v : c->scope())
+        {
             watchlist.at(v).insert(c);
+            to_propagate.push(v);
+        }
+        constraints.insert(c);
     }
 
     void solver::remove_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
         for (const auto &v : c->scope())
             watchlist.at(v).erase(c);
+        constraints.erase(c);
+    }
+
+    bool solver::assign(utils::var v, const utils::enum_val &val) noexcept
+    {
+        assert(dom.at(v).find(const_cast<utils::enum_val *>(&val)) != dom.at(v).end());
+        LOG_DEBUG("v" + std::to_string(v) + " = " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"));
+        for (auto it = dom.at(v).begin(); it != dom.at(v).end();)
+        {
+            if (*it != &val)
+                it = dom.at(v).erase(it);
+            else
+                ++it;
+        }
+        to_propagate.push(v);
+        return propagate();
     }
 
     bool solver::propagate() noexcept
@@ -60,10 +81,10 @@ namespace arc_consistency
         return true;
     }
 
-    bool solver::remove(utils::var v, const utils::enum_val &val) noexcept
+    bool solver::remove(utils::var v, utils::enum_val &val) noexcept
     {
-        assert(dom.at(v).find(const_cast<utils::enum_val *>(&val)) != dom.at(v).end());
-        dom.at(v).erase(const_cast<utils::enum_val *>(&val));
+        assert(dom.at(v).find(&val) != dom.at(v).end());
+        dom.at(v).erase(&val);
         if (dom.at(v).empty())
             return false;
         to_propagate.push(v);
@@ -94,6 +115,8 @@ namespace arc_consistency
                 }
             }
         }
+        for (const auto &c : s.constraints)
+            res += c->to_string() + "\n";
         return res;
     }
 } // namespace arc_consistency
