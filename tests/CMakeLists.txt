@@ -1,6 +1,6 @@
-add_executable(deltacsp_lib_tests test_deltacsp.cpp)
-add_dependencies(deltacsp_lib_tests DeltaCSP)
-target_link_libraries(deltacsp_lib_tests PRIVATE DeltaCSP)
-setup_sanitizers(deltacsp_lib_tests)
+add_executable(arc_consistency_lib_tests test_arc_consistency.cpp)
+add_dependencies(arc_consistency_lib_tests ArcConsistency)
+target_link_libraries(arc_consistency_lib_tests PRIVATE ArcConsistency)
+setup_sanitizers(arc_consistency_lib_tests)
 
-add_test(NAME DeltaCSP_LibTest COMMAND deltacsp_lib_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME ArcConsistency_LibTest COMMAND arc_consistency_lib_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

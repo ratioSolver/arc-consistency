@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <string>
 
-namespace ac
+namespace arc_consistency
 {
   class enum_val : public utils::enum_val
   {
@@ -45,4 +45,4 @@ namespace ac
   };
 
   [[nodiscard]] std::string to_string(const var &x) noexcept;
-} // namespace ac
+} // namespace arc_consistency

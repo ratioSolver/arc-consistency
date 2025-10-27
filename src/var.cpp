@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cassert>
 
-namespace ac
+namespace arc_consistency
 {
     const bool_val bool_val::True{true};
     const bool_val bool_val::False{false};
@@ -32,4 +32,4 @@ namespace ac
         else
             return "var";
     }
-} // namespace ac
+} // namespace arc_consistency
