@@ -55,6 +55,7 @@ namespace arc_consistency
     [[nodiscard]] bool propagate() noexcept;
 
     friend std::string to_string(const solver &s) noexcept;
+    friend std::string to_string(const solver &s, utils::var v) noexcept;
 
   private:
     [[nodiscard]] bool remove(utils::var v, utils::enum_val &val) noexcept;
@@ -68,4 +69,5 @@ namespace arc_consistency
   };
 
   [[nodiscard]] std::string to_string(const solver &s) noexcept;
+  [[nodiscard]] std::string to_string(const solver &s, utils::var v) noexcept;
 } // namespace arc_consistency

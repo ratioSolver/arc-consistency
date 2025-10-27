@@ -69,7 +69,7 @@ namespace arc_consistency
     bool solver::assign(utils::var v, const utils::enum_val &val) noexcept
     {
         assert(dom.at(v).find(const_cast<utils::enum_val *>(&val)) != dom.at(v).end());
-        LOG_DEBUG("v" + std::to_string(v) + " = " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"));
+        LOG_TRACE("v" + std::to_string(v) + " -> " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"));
         for (auto it = dom.at(v).begin(); it != dom.at(v).end();)
         {
             if (*it != &val)
@@ -77,6 +77,7 @@ namespace arc_consistency
             else
                 ++it;
         }
+        LOG_TRACE(to_string(*this, v));
         to_propagate.push(v);
         return propagate();
     }
@@ -100,6 +101,7 @@ namespace arc_consistency
         dom.at(v).erase(&val);
         if (dom.at(v).empty())
             return false;
+        LOG_TRACE(to_string(*this, v));
         to_propagate.push(v);
         return true;
     }
@@ -108,29 +110,34 @@ namespace arc_consistency
     {
         std::string res = "Solver State:\n";
         for (std::size_t i = 0; i < s.dom.size(); ++i)
-        {
-            res += "v" + std::to_string(i);
-            if (std::all_of(s.dom.at(i).begin(), s.dom.at(i).end(), [](const utils::enum_val *v)
-                            { return dynamic_cast<const enum_val *>(v); }))
-            {
-                if (s.dom.at(i).size() == 1)
-                    res += " = " + dynamic_cast<const enum_val *>(*s.dom.at(i).begin())->to_string() + "\n";
-                else
-                {
-                    res += " ∈ { ";
-                    for (auto it = s.dom.at(i).begin(); it != s.dom.at(i).end(); ++it)
-                    {
-                        res += dynamic_cast<const enum_val *>(*it)->to_string();
-                        if (std::next(it) != s.dom.at(i).end())
-                            res += ", ";
-                    }
-                    res += " }\n";
-                }
-            }
-        }
+            res += to_string(s, i) + "\n";
         res += "Constraints:\n";
         for (const auto &c : s.constraints)
             res += c->to_string() + "\n";
+        return res;
+    }
+
+    std::string to_string(const solver &s, utils::var v) noexcept
+    {
+        std::string res = "v" + std::to_string(v);
+        ;
+        if (std::all_of(s.dom.at(v).begin(), s.dom.at(v).end(), [](const utils::enum_val *val)
+                        { return dynamic_cast<const enum_val *>(val); }))
+        {
+            if (s.dom.at(v).size() == 1)
+                res += " = " + dynamic_cast<const enum_val *>(*s.dom.at(v).begin())->to_string();
+            else
+            {
+                res += " ∈ { ";
+                for (auto it = s.dom.at(v).begin(); it != s.dom.at(v).end(); ++it)
+                {
+                    res += dynamic_cast<const enum_val *>(*it)->to_string();
+                    if (std::next(it) != s.dom.at(v).end())
+                        res += ", ";
+                }
+                res += " }";
+            }
+        }
         return res;
     }
 } // namespace arc_consistency

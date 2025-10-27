@@ -7,7 +7,7 @@ class test_enum_val : public arc_consistency::enum_val
 public:
     explicit test_enum_val(std::string name) : name(std::move(name)) {}
 
-    [[nodiscard]] const std::string &get_name() const { return name; }
+    std::string to_string() const override { return name; }
 
 private:
     std::string name;
@@ -28,9 +28,45 @@ void test0()
     LOG_DEBUG(arc_consistency::to_string(s));
 }
 
+void test1()
+{
+    arc_consistency::solver s;
+    const auto v1 = s.new_sat();
+    const auto v2 = s.new_sat();
+    auto c1 = std::make_shared<arc_consistency::eq>(s, v1, v2);
+    s.add_constraint(c1);
+    auto prop = s.propagate();
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+    prop = s.assign(v1, arc_consistency::solver::True);
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+}
+
+void test2()
+{
+    test_enum_val a("A");
+    test_enum_val b("B");
+    test_enum_val c("C");
+
+    arc_consistency::solver s;
+    const auto v1 = s.new_var({a, b, c});
+    const auto v2 = s.new_var({a, b, c});
+    auto c1 = std::make_shared<arc_consistency::eq>(s, v1, v2);
+    s.add_constraint(c1);
+    auto prop = s.propagate();
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+    prop = s.assign(v1, a);
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+}
+
 int main()
 {
     test0();
+    test1();
+    test2();
 
     return 0;
 }
