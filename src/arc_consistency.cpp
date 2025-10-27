@@ -49,6 +49,12 @@ namespace arc_consistency
         return dom_vec;
     }
 
+    std::shared_ptr<constraint> solver::new_clause(std::vector<utils::lit> &&lits) noexcept { return std::make_shared<clause>(*this, std::move(lits)); }
+    std::shared_ptr<constraint> solver::new_equal(utils::var x, utils::var y) noexcept { return std::make_shared<eq>(*this, x, y); }
+    std::shared_ptr<constraint> solver::new_distinct(utils::var x, utils::var y) noexcept { return std::make_shared<neq>(*this, x, y); }
+    std::shared_ptr<constraint> solver::new_assign(utils::var x, utils::enum_val &val) noexcept { return std::make_shared<assign>(*this, x, val); }
+    std::shared_ptr<constraint> solver::new_forbid(utils::var x, utils::enum_val &val) noexcept { return std::make_shared<forbid>(*this, x, val); }
+
     void solver::add_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
         for (const auto &v : c->scope())
@@ -80,32 +86,6 @@ namespace arc_consistency
         for (const auto &v : c->scope())
             watchlist.at(v).erase(c);
         constraints.erase(c);
-    }
-
-    bool solver::assign(utils::var v, const utils::enum_val &val) noexcept
-    {
-        assert(dom.at(v).find(const_cast<utils::enum_val *>(&val)) != dom.at(v).end());
-        LOG_TRACE("v" + std::to_string(v) + " -> " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"));
-        for (auto it = dom.at(v).begin(); it != dom.at(v).end();)
-        {
-            if (*it != &val)
-                it = dom.at(v).erase(it);
-            else
-                ++it;
-        }
-        LOG_TRACE(to_string(*this, v));
-        to_propagate.push(v);
-        return propagate();
-    }
-
-    bool solver::forbid(utils::var v, const utils::enum_val &val) noexcept
-    {
-        assert(dom.at(v).find(const_cast<utils::enum_val *>(&val)) != dom.at(v).end());
-        LOG_TRACE("v" + std::to_string(v) + " != " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"));
-        if (!remove(v, const_cast<utils::enum_val &>(val)))
-            return false;
-        LOG_TRACE(to_string(*this, v));
-        return propagate();
     }
 
     bool solver::propagate() noexcept

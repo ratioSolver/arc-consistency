@@ -29,6 +29,36 @@ namespace arc_consistency
     solver &slv;
   };
 
+  class assign final : public constraint
+  {
+  public:
+    assign(solver &slv, utils::var v, utils::enum_val &val) noexcept;
+
+    std::vector<utils::var> scope() const noexcept override;
+    bool propagate(utils::var v) noexcept override;
+
+    std::string to_string() const noexcept override;
+
+  private:
+    utils::var v;
+    utils::enum_val &val;
+  };
+
+  class forbid final : public constraint
+  {
+  public:
+    forbid(solver &slv, utils::var v, utils::enum_val &val) noexcept;
+
+    std::vector<utils::var> scope() const noexcept override;
+    bool propagate(utils::var v) noexcept override;
+
+    std::string to_string() const noexcept override;
+
+  private:
+    utils::var v;
+    utils::enum_val &val;
+  };
+
   class clause final : public constraint
   {
   public:

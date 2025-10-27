@@ -12,6 +12,40 @@ namespace arc_consistency
         return slv.dom[v];
     }
 
+    assign::assign(solver &slv, utils::var v, utils::enum_val &val) noexcept : constraint(slv), v{v}, val{val} {}
+
+    std::vector<utils::var> assign::scope() const noexcept { return {v}; }
+
+    bool assign::propagate(utils::var) noexcept
+    {
+        auto &var_dom = domain(v);
+        for (auto it = var_dom.begin(); it != var_dom.end();)
+            if (*it != &val)
+            {
+                if (!remove(v, **it))
+                    return false;     // Domain wipeout
+                it = var_dom.begin(); // Restart iteration after modification
+            }
+            else
+                ++it;
+        return true;
+    }
+
+    std::string assign::to_string() const noexcept { return "v" + std::to_string(v) + " -> " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"); }
+
+    forbid::forbid(solver &slv, utils::var v, utils::enum_val &val) noexcept : constraint(slv), v{v}, val{val} {}
+
+    std::vector<utils::var> forbid::scope() const noexcept { return {v}; }
+
+    bool forbid::propagate(utils::var) noexcept
+    {
+        if (domain(v).find(&val) == domain(v).end())
+            return true; // Value already not in domain
+        return remove(v, val);
+    }
+
+    std::string forbid::to_string() const noexcept { return "v" + std::to_string(v) + " != " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"); }
+
     clause::clause(solver &slv, std::vector<utils::lit> &&lits) noexcept : constraint(slv), lits{std::move(lits)} {}
 
     std::vector<utils::var> clause::scope() const noexcept

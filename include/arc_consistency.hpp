@@ -47,11 +47,14 @@ namespace arc_consistency
     [[nodiscard]] utils::lbool sat_val(const utils::lit &l) const noexcept;
     [[nodiscard]] const std::vector<std::reference_wrapper<utils::enum_val>> domain(utils::var v) const noexcept;
 
+    [[nodiscard]] std::shared_ptr<constraint> new_clause(std::vector<utils::lit> &&lits) noexcept;
+    [[nodiscard]] std::shared_ptr<constraint> new_equal(utils::var x, utils::var y) noexcept;
+    [[nodiscard]] std::shared_ptr<constraint> new_distinct(utils::var x, utils::var y) noexcept;
+    [[nodiscard]] std::shared_ptr<constraint> new_assign(utils::var x, utils::enum_val &val) noexcept;
+    [[nodiscard]] std::shared_ptr<constraint> new_forbid(utils::var x, utils::enum_val &val) noexcept;
+
     void add_constraint(const std::shared_ptr<constraint> &c) noexcept;
     void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
-
-    [[nodiscard]] bool assign(utils::var v, const utils::enum_val &val) noexcept;
-    [[nodiscard]] bool forbid(utils::var v, const utils::enum_val &val) noexcept;
 
     [[nodiscard]] bool propagate() noexcept;
 
