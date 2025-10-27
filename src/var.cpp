@@ -2,35 +2,34 @@
 #include <algorithm>
 #include <cassert>
 
-namespace deltacsp
+namespace ac
 {
     const bool_val bool_val::True{true};
     const bool_val bool_val::False{false};
 
-    var::var(const std::unordered_set<const utils::enum_val *> &&dom, const utils::enum_val *init_v) noexcept : domain(std::move(dom)), value(init_v) { assert(init_v == nullptr || domain.find(init_v) != domain.end()); }
+    var::var(const std::unordered_set<const utils::enum_val *> &&init_dom) noexcept : init_domain(init_dom), dom(std::move(init_dom)) {}
 
     std::string to_string(const var &x) noexcept
     {
-        std::string res;
-        if (x.value)
+        if (x.dom.empty())
+            return "∅";
+        else if (std::all_of(x.init_domain.begin(), x.init_domain.end(), [&x](const utils::enum_val *v)
+                             { return dynamic_cast<const enum_val *>(v); }))
         {
-            res += " = ";
-            if (const auto *ev = dynamic_cast<const enum_val *>(x.value))
-                res += ev->to_string();
-        }
-        if (std::all_of(x.domain.begin(), x.domain.end(), [&x](const utils::enum_val *v)
-                        { return dynamic_cast<const enum_val *>(v); }))
-        {
-            res += " {";
-            for (auto it = x.domain.begin(); it != x.domain.end(); ++it)
+            if (x.dom.size() == 1)
+                return static_cast<const enum_val *>(*x.dom.begin())->to_string();
+            std::string res = " {";
+            for (auto it = x.dom.begin(); it != x.dom.end(); ++it)
             {
-                const auto *ev = dynamic_cast<const enum_val *>(*it);
+                const auto *ev = static_cast<const enum_val *>(*it);
                 res += ev->to_string();
-                if (std::next(it) != x.domain.end())
+                if (std::next(it) != x.dom.end())
                     res += ", ";
             }
             res += "}";
+            return res;
         }
-        return res;
+        else
+            return "var";
     }
-} // namespace deltacsp
+} // namespace ac
