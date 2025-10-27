@@ -1,5 +1,6 @@
 #include "arc_consistency.hpp"
 #include "logging.hpp"
+#include <algorithm>
 #include <cassert>
 
 namespace arc_consistency
@@ -79,8 +80,8 @@ namespace arc_consistency
                 {
                     dom.at(v) = init_domain.at(v);
                     to_propagate.push(v);
-                    for (const auto &c : watchlist.at(v))
-                        to_restore.push(c);
+                    for (const auto &cc : watchlist.at(v))
+                        to_restore.push(cc);
                 }
         }
         for (const auto &v : c->scope())
