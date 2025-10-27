@@ -4,6 +4,7 @@
 #include "enum.hpp"
 #include "lit.hpp"
 #include <vector>
+#include <unordered_set>
 
 namespace arc_consistency
 {
@@ -15,13 +16,14 @@ namespace arc_consistency
     constraint(solver &slv) noexcept : slv(slv) {}
     virtual ~constraint() = default;
 
-    virtual std::vector<utils::var> get_scope() const noexcept = 0;
+    virtual std::vector<utils::var> scope() const noexcept = 0;
     virtual bool propagate(utils::var v) noexcept = 0;
 
     virtual std::string to_string() const noexcept = 0;
 
   protected:
-    bool remove(utils::var v, const utils::enum_val &val) noexcept;
+    [[nodiscard]] bool remove(utils::var v, const utils::enum_val &val) noexcept;
+    [[nodiscard]] std::unordered_set<utils::enum_val *> &domain(utils::var v) const noexcept;
 
   protected:
     solver &slv;
@@ -32,7 +34,7 @@ namespace arc_consistency
   public:
     clause(solver &slv, std::vector<utils::lit> &&lits) noexcept;
 
-    std::vector<utils::var> get_scope() const noexcept override;
+    std::vector<utils::var> scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
 
     std::string to_string() const noexcept override;
@@ -46,7 +48,7 @@ namespace arc_consistency
   public:
     eq(solver &slv, utils::var var1, utils::var var2) noexcept;
 
-    std::vector<utils::var> get_scope() const noexcept override;
+    std::vector<utils::var> scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
 
     std::string to_string() const noexcept override;
@@ -61,7 +63,7 @@ namespace arc_consistency
   public:
     neq(solver &slv, utils::var var1, utils::var var2) noexcept;
 
-    std::vector<utils::var> get_scope() const noexcept override;
+    std::vector<utils::var> scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
 
     std::string to_string() const noexcept override;

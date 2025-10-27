@@ -24,6 +24,15 @@ namespace arc_consistency
         return x;
     }
 
+    utils::lbool solver::sat_val(const utils::var &x) const noexcept
+    {
+        assert(x < dom.size());
+        if (dom[x].size() == 1)
+            return (*dom[x].begin() == &solver::True) ? utils::True : utils::False;
+        else
+            return utils::Undefined; // variable is unassigned
+    }
+
     const std::vector<std::reference_wrapper<utils::enum_val>> solver::domain(utils::var v) const noexcept
     {
         std::vector<std::reference_wrapper<utils::enum_val>> dom_vec;
@@ -34,7 +43,7 @@ namespace arc_consistency
 
     void solver::add_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
-        for (const auto &v : c->get_scope())
+        for (const auto &v : c->scope())
             to_propagate.push(v);
         constraints.insert(c);
     }

@@ -43,13 +43,14 @@ namespace arc_consistency
     [[nodiscard]] utils::var new_sat() noexcept;
     [[nodiscard]] utils::var new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept;
 
-    const std::vector<std::reference_wrapper<utils::enum_val>> domain(utils::var v) const noexcept;
+    [[nodiscard]] utils::lbool sat_val(const utils::var &x) const noexcept;
+    [[nodiscard]] const std::vector<std::reference_wrapper<utils::enum_val>> domain(utils::var v) const noexcept;
 
     void add_constraint(const std::shared_ptr<constraint> &c) noexcept;
     void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
 
   private:
-    bool remove(utils::var v, const utils::enum_val &val) noexcept;
+    [[nodiscard]] bool remove(utils::var v, const utils::enum_val &val) noexcept;
 
   private:
     std::vector<std::unordered_set<utils::enum_val *>> init_domain; // initial domains
