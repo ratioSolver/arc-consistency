@@ -6,14 +6,6 @@ namespace arc_consistency
     bool_val solver::True{true};
     bool_val solver::False{false};
 
-    utils::var solver::new_sat() noexcept
-    {
-        const auto x = init_domain.size();
-        std::unordered_set<utils::enum_val *> domain_set = {&solver::True, &solver::False};
-        init_domain.emplace_back(std::move(domain_set));
-        return x;
-    }
-
     utils::var solver::new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept
     {
         const auto x = init_domain.size();
@@ -21,6 +13,8 @@ namespace arc_consistency
         for (const auto &ev_ref : domain)
             domain_set.insert(&ev_ref.get());
         init_domain.emplace_back(std::move(domain_set));
+        dom.emplace_back(init_domain.back());
+        watchlist.emplace_back();
         return x;
     }
 
@@ -36,7 +30,7 @@ namespace arc_consistency
     const std::vector<std::reference_wrapper<utils::enum_val>> solver::domain(utils::var v) const noexcept
     {
         std::vector<std::reference_wrapper<utils::enum_val>> dom_vec;
-        for (auto *ev_ptr : dom[v])
+        for (auto *ev_ptr : dom.at(v))
             dom_vec.emplace_back(*ev_ptr);
         return dom_vec;
     }
@@ -44,23 +38,62 @@ namespace arc_consistency
     void solver::add_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
         for (const auto &v : c->scope())
-            to_propagate.push(v);
-        constraints.insert(c);
+            watchlist.at(v).insert(c);
     }
 
     void solver::remove_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
-        constraints.erase(c);
+        for (const auto &v : c->scope())
+            watchlist.at(v).erase(c);
+    }
+
+    bool solver::propagate() noexcept
+    {
+        while (!to_propagate.empty())
+        {
+            const auto v = to_propagate.front();
+            to_propagate.pop();
+            for (const auto &c : watchlist.at(v))
+                if (!c->propagate(v))
+                    return false; // Conflict detected
+        }
+        return true;
     }
 
     bool solver::remove(utils::var v, const utils::enum_val &val) noexcept
     {
-        assert(v < dom.size());
-        assert(dom[v].find(const_cast<utils::enum_val *>(&val)) != dom[v].end());
-        dom[v].erase(const_cast<utils::enum_val *>(&val));
-        if (dom[v].empty())
+        assert(dom.at(v).find(const_cast<utils::enum_val *>(&val)) != dom.at(v).end());
+        dom.at(v).erase(const_cast<utils::enum_val *>(&val));
+        if (dom.at(v).empty())
             return false;
         to_propagate.push(v);
         return true;
+    }
+
+    std::string to_string(const solver &s) noexcept
+    {
+        std::string res;
+        for (std::size_t i = 0; i < s.dom.size(); ++i)
+        {
+            res += "v" + std::to_string(i);
+            if (std::all_of(s.dom.at(i).begin(), s.dom.at(i).end(), [](const utils::enum_val *v)
+                            { return dynamic_cast<const enum_val *>(v); }))
+            {
+                if (s.dom.at(i).size() == 1)
+                    res += " = " + dynamic_cast<const enum_val *>(*s.dom.at(i).begin())->to_string() + "\n";
+                else
+                {
+                    res += " ∈ { ";
+                    for (auto it = s.dom.at(i).begin(); it != s.dom.at(i).end(); ++it)
+                    {
+                        res += dynamic_cast<const enum_val *>(*it)->to_string();
+                        if (std::next(it) != s.dom.at(i).end())
+                            res += ", ";
+                    }
+                    res += " }\n";
+                }
+            }
+        }
+        return res;
     }
 } // namespace arc_consistency

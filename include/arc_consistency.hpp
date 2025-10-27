@@ -26,7 +26,7 @@ namespace arc_consistency
 
     bool get_value() const { return value; }
 
-    std::string to_string() const override { return value ? "True" : "False"; }
+    std::string to_string() const override { return value ? "⊤" : "⊥"; }
 
   private:
     bool value;
@@ -40,7 +40,7 @@ namespace arc_consistency
     static bool_val True;
     static bool_val False;
 
-    [[nodiscard]] utils::var new_sat() noexcept;
+    [[nodiscard]] utils::var new_sat() noexcept { return new_var({std::ref(solver::True), std::ref(solver::False)}); }
     [[nodiscard]] utils::var new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept;
 
     [[nodiscard]] utils::lbool sat_val(const utils::var &x) const noexcept;
@@ -49,13 +49,19 @@ namespace arc_consistency
     void add_constraint(const std::shared_ptr<constraint> &c) noexcept;
     void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
 
+    [[nodiscard]] bool propagate() noexcept;
+
+    friend std::string to_string(const solver &s) noexcept;
+
   private:
     [[nodiscard]] bool remove(utils::var v, const utils::enum_val &val) noexcept;
 
   private:
-    std::vector<std::unordered_set<utils::enum_val *>> init_domain; // initial domains
-    std::vector<std::unordered_set<utils::enum_val *>> dom;         // current domains
-    std::unordered_set<std::shared_ptr<constraint>> constraints;    // all the constraints
-    std::queue<utils::var> to_propagate;                            // variables to propagate
+    std::vector<std::unordered_set<utils::enum_val *>> init_domain;         // initial domains
+    std::vector<std::unordered_set<utils::enum_val *>> dom;                 // current domains
+    std::vector<std::unordered_set<std::shared_ptr<constraint>>> watchlist; // watchlist for each variable
+    std::queue<utils::var> to_propagate;                                    // variables to propagate
   };
+
+  [[nodiscard]] std::string to_string(const solver &s) noexcept;
 } // namespace arc_consistency
