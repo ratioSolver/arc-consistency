@@ -4,7 +4,7 @@ project(ArcConsistency VERSION 0.2.0 LANGUAGES CXX)
 include(CTest)
 enable_testing()
 
-add_library(ArcConsistency src/arc_consistency.cpp src/var.cpp src/constraint.cpp)
+add_library(ArcConsistency src/arc_consistency.cpp src/constraint.cpp)
 target_compile_features(ArcConsistency PUBLIC cxx_std_17)
 target_include_directories(ArcConsistency PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 if(NOT TARGET json)
