@@ -61,6 +61,7 @@ namespace arc_consistency
         LOG_TRACE("Adding " + c->to_string());
         for (const auto &v : c->scope())
         {
+            assert(v < watchlist.size());
             watchlist.at(v).insert(c.get());
             to_propagate.emplace(v, nullptr);
         }
@@ -97,6 +98,7 @@ namespace arc_consistency
         {
             const auto &[v, r] = to_propagate.front();
             to_propagate.pop();
+            assert(v < watchlist.size());
             for (const auto &c : watchlist.at(v))
                 if (c != r)
                 {
