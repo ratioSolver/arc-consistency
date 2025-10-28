@@ -56,7 +56,7 @@ namespace arc_consistency
     std::shared_ptr<constraint> solver::new_assign(utils::var x, utils::enum_val &val) noexcept { return std::make_shared<assign>(*this, x, val); }
     std::shared_ptr<constraint> solver::new_forbid(utils::var x, utils::enum_val &val) noexcept { return std::make_shared<forbid>(*this, x, val); }
 
-    void solver::add_constraint(const std::shared_ptr<constraint> &c) noexcept
+    void solver::add_constraint(std::shared_ptr<constraint> c) noexcept
     {
         LOG_TRACE("Adding " + c->to_string());
         for (const auto &v : c->scope())

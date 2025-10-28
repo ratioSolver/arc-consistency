@@ -52,7 +52,7 @@ namespace arc_consistency
     [[nodiscard]] std::shared_ptr<constraint> new_assign(utils::var x, utils::enum_val &val) noexcept;
     [[nodiscard]] std::shared_ptr<constraint> new_forbid(utils::var x, utils::enum_val &val) noexcept;
 
-    void add_constraint(const std::shared_ptr<constraint> &c) noexcept;
+    void add_constraint(std::shared_ptr<constraint> c) noexcept;
     void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
 
     [[nodiscard]] bool propagate() noexcept;
