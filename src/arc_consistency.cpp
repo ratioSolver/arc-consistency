@@ -13,7 +13,7 @@ namespace arc_consistency
         const auto x = init_domain.size();
         std::unordered_set<utils::enum_val *> domain_set;
         for (const auto &ev_ref : domain)
-            domain_set.insert(&ev_ref.get());
+            domain_set.emplace(&ev_ref.get());
         init_domain.emplace_back(std::move(domain_set));
         dom.emplace_back(init_domain.back());
         watchlist.emplace_back();
@@ -61,10 +61,10 @@ namespace arc_consistency
         LOG_TRACE("Adding " + c->to_string());
         for (const auto &v : c->scope())
         {
-            watchlist.at(v).insert(c.get());
+            watchlist.at(v).emplace(c.get());
             to_propagate.emplace(v, nullptr);
         }
-        constraints.insert(c);
+        constraints.emplace(c);
     }
 
     void solver::remove_constraint(const std::shared_ptr<constraint> &c) noexcept
@@ -78,7 +78,7 @@ namespace arc_consistency
             const auto curr = to_restore.front();
             to_restore.pop();
             for (const auto &v : curr->scope())
-                if (visited.insert(v).second)
+                if (visited.emplace(v).second)
                 {
                     dom.at(v) = init_domain.at(v);
                     to_propagate.emplace(v, nullptr);
