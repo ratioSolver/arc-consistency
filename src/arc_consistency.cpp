@@ -136,21 +136,26 @@ namespace arc_consistency
         ;
         if (std::all_of(s.dom.at(v).begin(), s.dom.at(v).end(), [](const utils::enum_val *val)
                         { return dynamic_cast<const enum_val *>(val); }))
-        {
-            if (s.dom.at(v).size() == 1)
-                res += " = " + dynamic_cast<const enum_val *>(*s.dom.at(v).begin())->to_string();
-            else
+            switch (s.dom.at(v).size())
             {
-                res += " ∈ { ";
+            case 0:
+                res += " = ∅";
+                break;
+            case 1:
+                res += " = ";
+                res += dynamic_cast<const enum_val *>(*s.dom.at(v).begin()) ? dynamic_cast<const enum_val *>(*s.dom.at(v).begin())->to_string() : "<unknown>";
+                break;
+            default:
+                res += " ∈ {";
                 for (auto it = s.dom.at(v).begin(); it != s.dom.at(v).end(); ++it)
                 {
-                    res += dynamic_cast<const enum_val *>(*it)->to_string();
+                    res += dynamic_cast<const enum_val *>(*it) ? dynamic_cast<const enum_val *>(*it)->to_string() : "<unknown>";
                     if (std::next(it) != s.dom.at(v).end())
                         res += ", ";
                 }
-                res += " }";
+                res += "}";
+                break;
             }
-        }
         return res;
     }
 } // namespace arc_consistency

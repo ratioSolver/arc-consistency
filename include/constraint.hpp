@@ -28,7 +28,6 @@ namespace arc_consistency
 
   protected:
     solver &slv;
-    std::unordered_map<utils::var, std::unordered_set<utils::enum_val *>> pruned_values;
   };
 
   class assign final : public constraint
