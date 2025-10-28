@@ -95,7 +95,7 @@ namespace arc_consistency
     {
         while (!to_propagate.empty())
         {
-            const auto &[v, r] = to_propagate.front();
+            const auto [v, r] = to_propagate.front();
             to_propagate.pop();
             for (const auto &c : watchlist.at(v))
                 if (c != r)
