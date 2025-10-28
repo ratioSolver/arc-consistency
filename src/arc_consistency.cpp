@@ -8,6 +8,13 @@ namespace arc_consistency
     bool_val solver::True{true};
     bool_val solver::False{false};
 
+    solver::solver() noexcept
+    {
+        utils::var c_false = new_sat();
+        assert(c_false == utils::FALSE_var);
+        dom.at(c_false).erase(&solver::True);
+    }
+
     utils::var solver::new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept
     {
         const auto x = init_domain.size();

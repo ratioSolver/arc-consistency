@@ -39,7 +39,9 @@ namespace arc_consistency
     static bool_val True;
     static bool_val False;
 
-    [[nodiscard]] utils::var new_sat() noexcept { return new_var({std::ref(solver::True), std::ref(solver::False)}); }
+    solver() noexcept;
+
+    [[nodiscard]] utils::var new_sat() noexcept { return new_var({solver::True, solver::False}); }
     [[nodiscard]] utils::var new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept;
 
     [[nodiscard]] utils::lbool sat_val(const utils::var &x) const noexcept;
