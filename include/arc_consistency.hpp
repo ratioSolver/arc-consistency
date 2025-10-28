@@ -1,7 +1,6 @@
 #pragma once
 
 #include "constraint.hpp"
-#include <unordered_set>
 #include <functional>
 #include <memory>
 #include <queue>
@@ -62,14 +61,14 @@ namespace arc_consistency
     friend std::string to_string(const solver &s, utils::var v) noexcept;
 
   private:
-    [[nodiscard]] bool remove(utils::var v, utils::enum_val &val) noexcept;
+    [[nodiscard]] bool remove(utils::var v, utils::enum_val &val, constraint &c) noexcept;
 
   private:
-    std::vector<std::unordered_set<utils::enum_val *>> init_domain;         // initial domains
-    std::vector<std::unordered_set<utils::enum_val *>> dom;                 // current domains
-    std::vector<std::unordered_set<std::shared_ptr<constraint>>> watchlist; // watchlist for each variable
-    std::unordered_set<std::shared_ptr<constraint>> constraints;            // all constraints
-    std::queue<utils::var> to_propagate;                                    // variables to propagate
+    std::vector<std::unordered_set<utils::enum_val *>> init_domain; // initial domains
+    std::vector<std::unordered_set<utils::enum_val *>> dom;         // current domains
+    std::vector<std::unordered_set<constraint *>> watchlist;        // watchlist for each variable
+    std::unordered_set<std::shared_ptr<constraint>> constraints;    // all constraints
+    std::queue<std::pair<utils::var, constraint *>> to_propagate;   // variables to propagate
   };
 
   [[nodiscard]] std::string to_string(const solver &s) noexcept;

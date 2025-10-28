@@ -58,19 +58,21 @@ namespace arc_consistency
 
     void solver::add_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
+        LOG_TRACE("Adding " + c->to_string());
         for (const auto &v : c->scope())
         {
-            watchlist.at(v).insert(c);
-            to_propagate.push(v);
+            watchlist.at(v).insert(c.get());
+            to_propagate.emplace(v, nullptr);
         }
         constraints.insert(c);
     }
 
     void solver::remove_constraint(const std::shared_ptr<constraint> &c) noexcept
     {
+        LOG_TRACE("Removing " + c->to_string());
         std::unordered_set<utils::var> visited;
-        std::queue<std::shared_ptr<constraint>> to_restore;
-        to_restore.push(c);
+        std::queue<constraint *> to_restore;
+        to_restore.push(c.get());
         while (!to_restore.empty())
         {
             const auto curr = to_restore.front();
@@ -79,13 +81,13 @@ namespace arc_consistency
                 if (visited.insert(v).second)
                 {
                     dom.at(v) = init_domain.at(v);
-                    to_propagate.push(v);
+                    to_propagate.emplace(v, nullptr);
                     for (const auto &cc : watchlist.at(v))
                         to_restore.push(cc);
                 }
         }
         for (const auto &v : c->scope())
-            watchlist.at(v).erase(c);
+            watchlist.at(v).erase(c.get());
         constraints.erase(c);
     }
 
@@ -93,23 +95,27 @@ namespace arc_consistency
     {
         while (!to_propagate.empty())
         {
-            const auto v = to_propagate.front();
+            const auto &[v, r] = to_propagate.front();
             to_propagate.pop();
             for (const auto &c : watchlist.at(v))
-                if (!c->propagate(v))
-                    return false; // Conflict detected
+                if (c != r)
+                {
+                    LOG_TRACE("Propagating " + c->to_string());
+                    if (!c->propagate(v))
+                        return false; // Conflict detected
+                }
         }
         return true;
     }
 
-    bool solver::remove(utils::var v, utils::enum_val &val) noexcept
+    bool solver::remove(utils::var v, utils::enum_val &val, constraint &c) noexcept
     {
         assert(dom.at(v).find(&val) != dom.at(v).end());
         dom.at(v).erase(&val);
         if (dom.at(v).empty())
             return false;
         LOG_TRACE(to_string(*this, v));
-        to_propagate.push(v);
+        to_propagate.emplace(v, &c);
         return true;
     }
 
