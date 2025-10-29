@@ -4,6 +4,8 @@ project(ArcConsistency VERSION 0.2.0 LANGUAGES CXX)
 include(CTest)
 enable_testing()
 
+option(ARCCONSISTENCY_BUILD_LISTENERS "Enable listener functionality in ArcConsistency" OFF)
+
 add_library(ArcConsistency src/arc_consistency.cpp src/constraint.cpp)
 target_compile_features(ArcConsistency PUBLIC cxx_std_17)
 target_include_directories(ArcConsistency PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
@@ -13,6 +15,11 @@ endif()
 add_dependencies(ArcConsistency json)
 target_link_libraries(ArcConsistency PUBLIC json)
 setup_sanitizers(ArcConsistency)
+
+message(STATUS "Enable listener functionality in ArcConsistency: ${ARCCONSISTENCY_BUILD_LISTENERS}")
+if(ARCCONSISTENCY_BUILD_LISTENERS)
+    target_compile_definitions(ArcConsistency PUBLIC ARCCONSISTENCY_BUILD_LISTENERS)
+endif()
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

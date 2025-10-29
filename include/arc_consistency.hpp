@@ -4,6 +4,9 @@
 #include <functional>
 #include <memory>
 #include <queue>
+#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#include <set>
+#endif
 
 namespace arc_consistency
 {
@@ -30,6 +33,10 @@ namespace arc_consistency
   private:
     bool value;
   };
+
+#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+  class listener;
+#endif
 
   class solver
   {
@@ -59,6 +66,11 @@ namespace arc_consistency
 
     [[nodiscard]] bool propagate() noexcept;
 
+#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+    void add_listener(std::shared_ptr<listener> l) noexcept;
+    void remove_listener(std::shared_ptr<listener> l) noexcept;
+#endif
+
     friend std::string to_string(const solver &s) noexcept;
     friend std::string to_string(const solver &s, utils::var v) noexcept;
 
@@ -71,7 +83,19 @@ namespace arc_consistency
     std::vector<std::unordered_set<constraint *>> watchlist;        // watchlist for each variable
     std::unordered_set<std::shared_ptr<constraint>> constraints;    // all constraints
     std::queue<std::pair<utils::var, constraint *>> to_propagate;   // variables to propagate
+#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+    std::unordered_map<utils::var, std::set<listener *>> listening; // for each variable, the listeners listening to it..
+    std::set<std::shared_ptr<listener>> listeners;                  // the collection of listeners..
+#endif
   };
+
+#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+  class listener
+  {
+  public:
+    virtual void on_domain_changed(const utils::var v) noexcept = 0;
+  };
+#endif
 
   [[nodiscard]] std::string to_string(const solver &s) noexcept;
   [[nodiscard]] std::string to_string(const solver &s, utils::var v) noexcept;

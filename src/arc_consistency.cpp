@@ -3,6 +3,15 @@
 #include <algorithm>
 #include <cassert>
 
+#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#define FIRE_ON_DOMAIN_CHANGED(var)                                      \
+    if (const auto &at_v = listening.find(var); at_v != listening.end()) \
+        for (auto &l : at_v->second)                                     \
+            l->on_domain_changed(var);
+#else
+#define FIRE_ON_DOMAIN_CHANGED(var)
+#endif
+
 namespace arc_consistency
 {
     bool_val solver::True{true};
@@ -88,6 +97,7 @@ namespace arc_consistency
                 if (visited.emplace(v).second)
                 {
                     dom.at(v) = init_domain.at(v);
+                    FIRE_ON_DOMAIN_CHANGED(v);
                     to_propagate.emplace(v, nullptr);
                     for (const auto &cc : watchlist.at(v))
                         to_restore.push(cc);
@@ -119,6 +129,7 @@ namespace arc_consistency
     {
         assert(dom.at(v).find(&val) != dom.at(v).end());
         dom.at(v).erase(&val);
+        FIRE_ON_DOMAIN_CHANGED(v);
         if (dom.at(v).empty())
             return false;
         LOG_TRACE(to_string(*this, v));
@@ -140,7 +151,6 @@ namespace arc_consistency
     std::string to_string(const solver &s, utils::var v) noexcept
     {
         std::string res = "v" + std::to_string(v);
-        ;
         if (std::all_of(s.dom.at(v).begin(), s.dom.at(v).end(), [](const utils::enum_val *val)
                         { return dynamic_cast<const enum_val *>(val); }))
             switch (s.dom.at(v).size())
