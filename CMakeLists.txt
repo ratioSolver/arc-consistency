@@ -4,7 +4,7 @@ project(ArcConsistency VERSION 0.2.0 LANGUAGES CXX)
 include(CTest)
 enable_testing()
 
-option(ARCCONSISTENCY_BUILD_LISTENERS "Enable listener functionality in ArcConsistency" OFF)
+option(ARCCONSISTENCY_ENABLE_LISTENERS "Enable listener functionality in ArcConsistency" OFF)
 
 add_library(ArcConsistency src/arc_consistency.cpp src/constraint.cpp)
 target_compile_features(ArcConsistency PUBLIC cxx_std_17)
@@ -16,9 +16,9 @@ add_dependencies(ArcConsistency json)
 target_link_libraries(ArcConsistency PUBLIC json)
 setup_sanitizers(ArcConsistency)
 
-message(STATUS "Enable listener functionality in ArcConsistency: ${ARCCONSISTENCY_BUILD_LISTENERS}")
-if(ARCCONSISTENCY_BUILD_LISTENERS)
-    target_compile_definitions(ArcConsistency PUBLIC ARCCONSISTENCY_BUILD_LISTENERS)
+message(STATUS "Enable listener functionality in ArcConsistency: ${ARCCONSISTENCY_ENABLE_LISTENERS}")
+if(ARCCONSISTENCY_ENABLE_LISTENERS)
+    target_compile_definitions(ArcConsistency PUBLIC ARCCONSISTENCY_ENABLE_LISTENERS)
 endif()
 
 if(BUILD_TESTING)

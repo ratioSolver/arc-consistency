@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 
-#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
 #define FIRE_ON_DOMAIN_CHANGED(var)                                      \
     if (const auto &at_v = listening.find(var); at_v != listening.end()) \
         for (auto &l : at_v->second)                                     \
@@ -137,7 +137,7 @@ namespace arc_consistency
         return true;
     }
 
-#ifdef LINSPIRE_BUILD_LISTENERS
+#ifdef LINSPIRE_ENABLE_LISTENERS
     void solver::add_listener(std::shared_ptr<listener> l) noexcept { listeners.insert(l); }
     void solver::remove_listener(std::shared_ptr<listener> l) noexcept { listeners.erase(l); }
 #endif

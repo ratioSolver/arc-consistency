@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 #include <queue>
-#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
 #include <set>
 #endif
 
@@ -34,7 +34,7 @@ namespace arc_consistency
     bool value;
   };
 
-#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
   class listener;
 #endif
 
@@ -66,7 +66,7 @@ namespace arc_consistency
 
     [[nodiscard]] bool propagate() noexcept;
 
-#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
     void add_listener(std::shared_ptr<listener> l) noexcept;
     void remove_listener(std::shared_ptr<listener> l) noexcept;
 #endif
@@ -83,13 +83,13 @@ namespace arc_consistency
     std::vector<std::unordered_set<constraint *>> watchlist;        // watchlist for each variable
     std::unordered_set<std::shared_ptr<constraint>> constraints;    // all constraints
     std::queue<std::pair<utils::var, constraint *>> to_propagate;   // variables to propagate
-#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
     std::unordered_map<utils::var, std::set<listener *>> listening; // for each variable, the listeners listening to it..
     std::set<std::shared_ptr<listener>> listeners;                  // the collection of listeners..
 #endif
   };
 
-#ifdef ARCCONSISTENCY_BUILD_LISTENERS
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
   class listener
   {
   public:
