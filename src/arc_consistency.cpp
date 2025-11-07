@@ -125,6 +125,18 @@ namespace arc_consistency
         return true;
     }
 
+    bool solver::match(const utils::lit &l0, const utils::lit &l1) const noexcept { return utils::sign(l0) == utils::sign(l1) ? match(utils::variable(l0), utils::variable(l1)) : !match(utils::variable(l0), utils::variable(l1)); }
+
+    bool solver::match(const utils::var v0, const utils::var v1) const noexcept
+    {
+        for (auto *val0 : dom.at(v0))
+            if (dom.at(v1).count(val0))
+                return true;
+        return false;
+    }
+
+    bool solver::allows(utils::var v, utils::enum_val &val) const noexcept { return dom.at(v).count(&val); }
+
     bool solver::remove(utils::var v, utils::enum_val &val, constraint &c) noexcept
     {
         assert(dom.at(v).find(&val) != dom.at(v).end());

@@ -171,6 +171,42 @@ namespace arc_consistency
      */
     [[nodiscard]] bool propagate() noexcept;
 
+    /**
+     * @brief Checks if two literals can be matched.
+     *
+     * This function checks if there exists a consistent assignment between the domains of two literals.
+     *
+     * @param l0 The first literal.
+     * @param l1 The second literal.
+     * @return true If the literals can be matched.
+     * @return false If the literals cannot be matched.
+     */
+    [[nodiscard]] bool match(const utils::lit &l0, const utils::lit &l1) const noexcept;
+
+    /**
+     * @brief Checks if two variables can be matched.
+     *
+     * This function checks if there exists a consistent assignment between the domains of two variables.
+     *
+     * @param v0 The first variable.
+     * @param v1 The second variable.
+     * @return true If the variables can be matched.
+     * @return false If the variables cannot be matched.
+     */
+    [[nodiscard]] bool match(const utils::var v0, const utils::var v1) const noexcept;
+
+    /**
+     * @brief Checks if a value is allowed in the domain of a variable.
+     *
+     * This function checks if the specified value is currently allowed in the domain of the given variable.
+     *
+     * @param v The variable to check.
+     * @param val The value to check for allowance.
+     * @return true If the value is allowed in the variable's domain.
+     * @return false If the value is not allowed in the variable's domain.
+     */
+    [[nodiscard]] bool allows(utils::var v, utils::enum_val &val) const noexcept;
+
 #ifdef ARCCONSISTENCY_ENABLE_LISTENERS
     /**
      * @brief Adds a listener to the solver.
