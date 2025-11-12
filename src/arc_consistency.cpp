@@ -83,9 +83,9 @@ namespace arc_consistency
         constraints.emplace(c);
     }
 
-    void solver::remove_constraint(const std::shared_ptr<constraint> &c) noexcept
+    void solver::retract(const std::shared_ptr<constraint> &c) noexcept
     {
-        LOG_TRACE("Removing " + c->to_string());
+        LOG_TRACE("Retracting " + c->to_string());
         std::unordered_set<utils::var> visited;
         std::queue<constraint *> to_restore;
         to_restore.push(c.get());
@@ -149,9 +149,14 @@ namespace arc_consistency
         return true;
     }
 
-#ifdef LINSPIRE_ENABLE_LISTENERS
-    void solver::add_listener(std::shared_ptr<listener> l) noexcept { listeners.insert(l); }
-    void solver::remove_listener(std::shared_ptr<listener> l) noexcept { listeners.erase(l); }
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
+    void solver::add_listener(listener &l) noexcept { listeners.insert(&l); }
+    void solver::remove_listener(listener &l) noexcept
+    {
+        for (const auto &v : l.listened_vars)
+            listening[v].erase(&l);
+        listeners.erase(&l);
+    }
 #endif
 
     std::string to_string(const solver &s) noexcept

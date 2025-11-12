@@ -101,7 +101,7 @@ void test3()
     assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &a);
     assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &a);
     assert(s.domain(v2).size() == 1 && &s.domain(v2).begin()->get() == &a);
-    s.remove_constraint(c1);
+    s.retract(c1);
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
@@ -147,7 +147,7 @@ void test4()
     prop = s.propagate();
     assert(!prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    s.remove_constraint(c1);
+    s.retract(c1);
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));

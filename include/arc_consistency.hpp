@@ -41,6 +41,9 @@ namespace arc_consistency
   class solver
   {
     friend class constraint;
+#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
+    friend class listener;
+#endif
 
   public:
     static bool_val True;
@@ -153,13 +156,13 @@ namespace arc_consistency
      */
     void add_constraint(std::shared_ptr<constraint> c) noexcept;
     /**
-     * @brief Removes a constraint from the solver.
+     * @brief Retracts a constraint from the solver.
      *
      * This function removes the specified constraint from the solver.
      *
-     * @param c A shared pointer to the constraint to be removed.
+     * @param c A shared pointer to the constraint to be retracted.
      */
-    void remove_constraint(const std::shared_ptr<constraint> &c) noexcept;
+    void retract(const std::shared_ptr<constraint> &c) noexcept;
 
     /**
      * @brief Propagates all constraints in the solver.
@@ -208,6 +211,7 @@ namespace arc_consistency
     [[nodiscard]] bool allows(utils::var v, utils::enum_val &val) const noexcept;
 
 #ifdef ARCCONSISTENCY_ENABLE_LISTENERS
+  private:
     /**
      * @brief Adds a listener to the solver.
      *
@@ -215,7 +219,7 @@ namespace arc_consistency
      *
      * @param l A shared pointer to the listener to be added.
      */
-    void add_listener(std::shared_ptr<listener> l) noexcept;
+    void add_listener(listener &l) noexcept;
     /**
      * @brief Removes a listener from the solver.
      *
@@ -223,7 +227,7 @@ namespace arc_consistency
      *
      * @param l A shared pointer to the listener to be removed.
      */
-    void remove_listener(std::shared_ptr<listener> l) noexcept;
+    void remove_listener(listener &l) noexcept;
 #endif
 
     friend std::string to_string(const solver &s) noexcept;
@@ -240,15 +244,32 @@ namespace arc_consistency
     std::queue<std::pair<utils::var, constraint *>> to_propagate;   // variables to propagate
 #ifdef ARCCONSISTENCY_ENABLE_LISTENERS
     std::unordered_map<utils::var, std::set<listener *>> listening; // for each variable, the listeners listening to it..
-    std::set<std::shared_ptr<listener>> listeners;                  // the collection of listeners..
+    std::set<listener *> listeners;                                 // the collection of listeners..
 #endif
   };
 
 #ifdef ARCCONSISTENCY_ENABLE_LISTENERS
   class listener
   {
+    friend class solver;
+
   public:
+    explicit listener(solver &slv) noexcept : slv(slv) { slv.add_listener(*this); }
+    virtual ~listener() noexcept { slv.remove_listener(*this); }
+
+  protected:
+    void listen_to(utils::var v) noexcept
+    {
+      if (listened_vars.insert(v).second)
+        slv.listening[v].insert(this);
+    }
+
+  private:
     virtual void on_domain_changed(const utils::var v) noexcept = 0;
+
+  private:
+    solver &slv;
+    std::set<utils::var> listened_vars;
   };
 #endif
 
