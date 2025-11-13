@@ -67,7 +67,7 @@ namespace arc_consistency
      * @param domain The domain of the new variable.
      * @return utils::var The newly created variable.
      */
-    [[nodiscard]] utils::var new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept;
+    [[nodiscard]] utils::var new_var(const std::vector<std::reference_wrapper<const utils::enum_val>> &domain) noexcept;
 
     /**
      * @brief Gets the SAT value of a variable.
@@ -95,7 +95,7 @@ namespace arc_consistency
      * @param v The variable whose domain is to be retrieved.
      * @return std::vector<std::reference_wrapper<utils::enum_val>> The current domain of the variable.
      */
-    [[nodiscard]] const std::vector<std::reference_wrapper<utils::enum_val>> domain(utils::var v) const noexcept;
+    [[nodiscard]] const std::vector<std::reference_wrapper<const utils::enum_val>> domain(utils::var v) const noexcept;
 
     /**
      * @brief Creates a new clause constraint.
@@ -103,9 +103,9 @@ namespace arc_consistency
      * This function creates a new clause constraint with the specified literals.
      *
      * @param lits The literals that make up the clause.
-     * @return std::shared_ptr<constraint> A shared pointer to the newly created clause constraint.
+     * @return constraint& A reference to the newly created clause constraint.
      */
-    [[nodiscard]] std::shared_ptr<constraint> new_clause(std::vector<utils::lit> &&lits) noexcept;
+    [[nodiscard]] constraint &new_clause(std::vector<utils::lit> &&lits) noexcept;
     /**
      * @brief Creates a new equal constraint.
      *
@@ -113,9 +113,9 @@ namespace arc_consistency
      *
      * @param x The first variable.
      * @param y The second variable.
-     * @return std::shared_ptr<constraint> A shared pointer to the newly created equal constraint.
+     * @return constraint& A reference to the newly created equal constraint.
      */
-    [[nodiscard]] std::shared_ptr<constraint> new_equal(utils::var x, utils::var y) noexcept;
+    [[nodiscard]] constraint &new_equal(utils::var x, utils::var y) noexcept;
     /**
      * @brief Creates a new distinct constraint.
      *
@@ -123,9 +123,9 @@ namespace arc_consistency
      *
      * @param x The first variable.
      * @param y The second variable.
-     * @return std::shared_ptr<constraint> A shared pointer to the newly created distinct constraint.
+     * @return constraint& A reference to the newly created distinct constraint.
      */
-    [[nodiscard]] std::shared_ptr<constraint> new_distinct(utils::var x, utils::var y) noexcept;
+    [[nodiscard]] constraint &new_distinct(utils::var x, utils::var y) noexcept;
     /**
      * @brief Creates a new assign constraint.
      *
@@ -133,9 +133,9 @@ namespace arc_consistency
      *
      * @param x The variable to be assigned.
      * @param val The value to assign to the variable.
-     * @return std::shared_ptr<constraint> A shared pointer to the newly created assign constraint.
+     * @return constraint& A reference to the newly created assign constraint.
      */
-    [[nodiscard]] std::shared_ptr<constraint> new_assign(utils::var x, utils::enum_val &val) noexcept;
+    [[nodiscard]] constraint &new_assign(utils::var x, utils::enum_val &val) noexcept;
     /**
      * @brief Creates a new forbid constraint.
      *
@@ -143,26 +143,26 @@ namespace arc_consistency
      *
      * @param x The variable to be constrained.
      * @param val The value to forbid for the variable.
-     * @return std::shared_ptr<constraint> A shared pointer to the newly created forbid constraint.
+     * @return constraint& A reference to the newly created forbid constraint.
      */
-    [[nodiscard]] std::shared_ptr<constraint> new_forbid(utils::var x, utils::enum_val &val) noexcept;
+    [[nodiscard]] constraint &new_forbid(utils::var x, utils::enum_val &val) noexcept;
 
     /**
      * @brief Adds a constraint to the solver.
      *
      * This function adds the specified constraint to the solver for propagation.
      *
-     * @param c A shared pointer to the constraint to be added.
+     * @param c The constraint to be added.
      */
-    void add_constraint(std::shared_ptr<constraint> c) noexcept;
+    void add_constraint(constraint &c) noexcept;
     /**
      * @brief Retracts a constraint from the solver.
      *
      * This function removes the specified constraint from the solver.
      *
-     * @param c A shared pointer to the constraint to be retracted.
+     * @param c The constraint to be retracted.
      */
-    void retract(const std::shared_ptr<constraint> &c) noexcept;
+    void retract(constraint &c) noexcept;
 
     /**
      * @brief Propagates all constraints in the solver.
@@ -208,7 +208,7 @@ namespace arc_consistency
      * @return true If the value is allowed in the variable's domain.
      * @return false If the value is not allowed in the variable's domain.
      */
-    [[nodiscard]] bool allows(utils::var v, utils::enum_val &val) const noexcept;
+    [[nodiscard]] bool allows(utils::var v, const utils::enum_val &val) const noexcept;
 
 #ifdef ARCCONSISTENCY_ENABLE_LISTENERS
   private:
@@ -234,14 +234,15 @@ namespace arc_consistency
     friend std::string to_string(const solver &s, utils::var v) noexcept;
 
   private:
-    [[nodiscard]] bool remove(utils::var v, utils::enum_val &val, constraint &c) noexcept;
+    [[nodiscard]] bool remove(utils::var v, const utils::enum_val &val, constraint &c) noexcept;
 
   private:
-    std::vector<std::unordered_set<utils::enum_val *>> init_domain; // initial domains
-    std::vector<std::unordered_set<utils::enum_val *>> dom;         // current domains
-    std::vector<std::unordered_set<constraint *>> watchlist;        // watchlist for each variable
-    std::unordered_set<std::shared_ptr<constraint>> constraints;    // all constraints
-    std::queue<std::pair<utils::var, constraint *>> to_propagate;   // variables to propagate
+    std::vector<std::unordered_set<const utils::enum_val *>> init_domain; // initial domains
+    std::vector<std::unordered_set<const utils::enum_val *>> dom;         // current domains
+    std::vector<std::unordered_set<constraint *>> watchlist;              // watchlist for each variable
+    std::vector<std::unique_ptr<constraint>> constraints;                 // all the constraints
+    std::unordered_set<constraint *> active_constraints;                  // currently active constraints
+    std::queue<std::pair<utils::var, constraint *>> to_propagate;         // variables to propagate
 #ifdef ARCCONSISTENCY_ENABLE_LISTENERS
     std::unordered_map<utils::var, std::set<listener *>> listening; // for each variable, the listeners listening to it..
     std::set<listener *> listeners;                                 // the collection of listeners..

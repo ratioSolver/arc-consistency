@@ -5,8 +5,8 @@
 
 namespace arc_consistency
 {
-    bool constraint::remove(utils::var v, utils::enum_val &val) noexcept { return slv.remove(v, val, *this); }
-    std::unordered_set<utils::enum_val *> &constraint::domain(utils::var v) const noexcept
+    bool constraint::remove(utils::var v, const utils::enum_val &val) noexcept { return slv.remove(v, val, *this); }
+    std::unordered_set<const utils::enum_val *> &constraint::domain(utils::var v) const noexcept
     {
         assert(v < slv.dom.size());
         return slv.dom[v];

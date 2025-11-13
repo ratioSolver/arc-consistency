@@ -84,8 +84,8 @@ void test3()
     const auto v0 = s.new_var({a, b, c});
     const auto v1 = s.new_var({a, b, c});
     const auto v2 = s.new_var({a, b, c});
-    auto c1 = s.new_equal(v0, v1);
-    auto c2 = s.new_equal(v1, v2);
+    auto &c1 = s.new_equal(v0, v1);
+    auto &c2 = s.new_equal(v1, v2);
     s.add_constraint(c1);
     s.add_constraint(c2);
     auto prop = s.propagate();
@@ -126,8 +126,8 @@ void test4()
     const auto v0 = s.new_var({a, b});
     const auto v1 = s.new_var({a, b});
     const auto v2 = s.new_var({a, b});
-    auto c1 = s.new_distinct(v0, v1);
-    auto c2 = s.new_distinct(v1, v2);
+    auto &c1 = s.new_distinct(v0, v1);
+    auto &c2 = s.new_distinct(v1, v2);
     s.add_constraint(c1);
     s.add_constraint(c2);
     auto prop = s.propagate();

@@ -23,8 +23,8 @@ namespace arc_consistency
     virtual std::string to_string() const noexcept = 0;
 
   protected:
-    [[nodiscard]] bool remove(utils::var v, utils::enum_val &val) noexcept;
-    [[nodiscard]] std::unordered_set<utils::enum_val *> &domain(utils::var v) const noexcept;
+    [[nodiscard]] bool remove(utils::var v, const utils::enum_val &val) noexcept;
+    [[nodiscard]] std::unordered_set<const utils::enum_val *> &domain(utils::var v) const noexcept;
 
   protected:
     solver &slv;
@@ -41,8 +41,8 @@ namespace arc_consistency
     std::string to_string() const noexcept override;
 
   private:
-    utils::var v;
-    utils::enum_val &val;
+    const utils::var v;
+    const utils::enum_val &val;
   };
 
   class forbid final : public constraint
@@ -56,8 +56,8 @@ namespace arc_consistency
     std::string to_string() const noexcept override;
 
   private:
-    utils::var v;
-    utils::enum_val &val;
+    const utils::var v;
+    const utils::enum_val &val;
   };
 
   class clause final : public constraint
@@ -85,8 +85,8 @@ namespace arc_consistency
     std::string to_string() const noexcept override;
 
   private:
-    utils::var var1;
-    utils::var var2;
+    const utils::var var1;
+    const utils::var var2;
   };
 
   class neq final : public constraint
@@ -100,7 +100,7 @@ namespace arc_consistency
     std::string to_string() const noexcept override;
 
   private:
-    utils::var var1;
-    utils::var var2;
+    const utils::var var1;
+    const utils::var var2;
   };
 } // namespace arc_consistency

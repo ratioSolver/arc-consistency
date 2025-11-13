@@ -24,10 +24,10 @@ namespace arc_consistency
         dom.at(c_false).erase(&solver::True);
     }
 
-    utils::var solver::new_var(const std::vector<std::reference_wrapper<utils::enum_val>> &domain) noexcept
+    utils::var solver::new_var(const std::vector<std::reference_wrapper<const utils::enum_val>> &domain) noexcept
     {
         const auto x = init_domain.size();
-        std::unordered_set<utils::enum_val *> domain_set;
+        std::unordered_set<const utils::enum_val *> domain_set;
         for (const auto &ev_ref : domain)
             domain_set.emplace(&ev_ref.get());
         init_domain.emplace_back(std::move(domain_set));
@@ -58,37 +58,67 @@ namespace arc_consistency
         }
     }
 
-    const std::vector<std::reference_wrapper<utils::enum_val>> solver::domain(utils::var v) const noexcept
+    const std::vector<std::reference_wrapper<const utils::enum_val>> solver::domain(utils::var v) const noexcept
     {
-        std::vector<std::reference_wrapper<utils::enum_val>> dom_vec;
+        std::vector<std::reference_wrapper<const utils::enum_val>> dom_vec;
         for (auto *ev_ptr : dom.at(v))
             dom_vec.emplace_back(*ev_ptr);
         return dom_vec;
     }
 
-    std::shared_ptr<constraint> solver::new_clause(std::vector<utils::lit> &&lits) noexcept { return std::make_shared<clause>(*this, std::move(lits)); }
-    std::shared_ptr<constraint> solver::new_equal(utils::var x, utils::var y) noexcept { return std::make_shared<eq>(*this, x, y); }
-    std::shared_ptr<constraint> solver::new_distinct(utils::var x, utils::var y) noexcept { return std::make_shared<neq>(*this, x, y); }
-    std::shared_ptr<constraint> solver::new_assign(utils::var x, utils::enum_val &val) noexcept { return std::make_shared<assign>(*this, x, val); }
-    std::shared_ptr<constraint> solver::new_forbid(utils::var x, utils::enum_val &val) noexcept { return std::make_shared<forbid>(*this, x, val); }
-
-    void solver::add_constraint(std::shared_ptr<constraint> c) noexcept
+    constraint &solver::new_clause(std::vector<utils::lit> &&lits) noexcept
     {
-        LOG_TRACE("Adding " + c->to_string());
-        for (const auto &v : c->scope())
-        {
-            watchlist.at(v).emplace(c.get());
-            to_propagate.emplace(v, nullptr);
-        }
-        constraints.emplace(c);
+        auto c = std::make_unique<clause>(*this, std::move(lits));
+        auto &ref = *c;
+        constraints.emplace_back(std::move(c));
+        return ref;
+    }
+    constraint &solver::new_equal(utils::var x, utils::var y) noexcept
+    {
+        auto c = std::make_unique<eq>(*this, x, y);
+        auto &ref = *c;
+        constraints.emplace_back(std::move(c));
+        return ref;
+    }
+    constraint &solver::new_distinct(utils::var x, utils::var y) noexcept
+    {
+        auto c = std::make_unique<neq>(*this, x, y);
+        auto &ref = *c;
+        constraints.emplace_back(std::move(c));
+        return ref;
+    }
+    constraint &solver::new_assign(utils::var x, utils::enum_val &val) noexcept
+    {
+        auto c = std::make_unique<assign>(*this, x, val);
+        auto &ref = *c;
+        constraints.emplace_back(std::move(c));
+        return ref;
+    }
+    constraint &solver::new_forbid(utils::var x, utils::enum_val &val) noexcept
+    {
+        auto c = std::make_unique<forbid>(*this, x, val);
+        auto &ref = *c;
+        constraints.emplace_back(std::move(c));
+        return ref;
     }
 
-    void solver::retract(const std::shared_ptr<constraint> &c) noexcept
+    void solver::add_constraint(constraint &c) noexcept
     {
-        LOG_TRACE("Retracting " + c->to_string());
+        LOG_TRACE("Adding " + c.to_string());
+        for (const auto &v : c.scope())
+        {
+            watchlist.at(v).emplace(&c);
+            to_propagate.emplace(v, nullptr);
+        }
+        active_constraints.emplace(&c);
+    }
+
+    void solver::retract(constraint &c) noexcept
+    {
+        LOG_TRACE("Retracting " + c.to_string());
         std::unordered_set<utils::var> visited;
         std::queue<constraint *> to_restore;
-        to_restore.push(c.get());
+        to_restore.push(&c);
         while (!to_restore.empty())
         {
             const auto curr = to_restore.front();
@@ -103,9 +133,9 @@ namespace arc_consistency
                         to_restore.push(cc);
                 }
         }
-        for (const auto &v : c->scope())
-            watchlist.at(v).erase(c.get());
-        constraints.erase(c);
+        for (const auto &v : c.scope())
+            watchlist.at(v).erase(&c);
+        active_constraints.erase(&c);
     }
 
     bool solver::propagate() noexcept
@@ -135,9 +165,9 @@ namespace arc_consistency
         return false;
     }
 
-    bool solver::allows(utils::var v, utils::enum_val &val) const noexcept { return dom.at(v).count(&val); }
+    bool solver::allows(utils::var v, const utils::enum_val &val) const noexcept { return dom.at(v).count(&val); }
 
-    bool solver::remove(utils::var v, utils::enum_val &val, constraint &c) noexcept
+    bool solver::remove(utils::var v, const utils::enum_val &val, constraint &c) noexcept
     {
         assert(dom.at(v).find(&val) != dom.at(v).end());
         dom.at(v).erase(&val);
@@ -165,7 +195,7 @@ namespace arc_consistency
         for (std::size_t i = 0; i < s.dom.size(); ++i)
             res += to_string(s, i) + "\n";
         res += "Constraints:\n";
-        for (const auto &c : s.constraints)
+        for (const auto &c : s.active_constraints)
             res += c->to_string() + "\n";
         return res;
     }
