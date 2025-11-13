@@ -30,7 +30,6 @@ namespace arc_consistency
     solver &slv;
   };
 
-  
   class assign final : public constraint
   {
   public:
