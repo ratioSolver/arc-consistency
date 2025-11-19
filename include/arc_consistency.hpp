@@ -93,9 +93,9 @@ namespace arc_consistency
      * This function returns the current domain of the specified variable.
      *
      * @param v The variable whose domain is to be retrieved.
-     * @return std::vector<std::reference_wrapper<utils::enum_val>> The current domain of the variable.
+     * @return const std::unordered_set<const utils::enum_val *>& The current domain of the variable.
      */
-    [[nodiscard]] const std::vector<std::reference_wrapper<const utils::enum_val>> domain(utils::var v) const noexcept;
+    [[nodiscard]] const std::unordered_set<const utils::enum_val *> &domain(utils::var v) const noexcept { return dom.at(v); }
 
     /**
      * @brief Creates a new clause constraint.

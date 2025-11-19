@@ -58,14 +58,6 @@ namespace arc_consistency
         }
     }
 
-    const std::vector<std::reference_wrapper<const utils::enum_val>> solver::domain(utils::var v) const noexcept
-    {
-        std::vector<std::reference_wrapper<const utils::enum_val>> dom_vec;
-        for (auto *ev_ptr : dom.at(v))
-            dom_vec.emplace_back(*ev_ptr);
-        return dom_vec;
-    }
-
     constraint &solver::new_clause(std::vector<utils::lit> &&lits) noexcept
     {
         auto c = std::make_unique<clause>(*this, std::move(lits));
