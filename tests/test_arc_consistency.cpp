@@ -28,8 +28,8 @@ void test0()
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &arc_consistency::solver::False);
-    assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &arc_consistency::solver::False);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &arc_consistency::solver::False);
+    assert(s.domain(v1).size() == 1 && *s.domain(v1).begin() == &arc_consistency::solver::False);
 }
 
 void test1()
@@ -47,8 +47,8 @@ void test1()
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &arc_consistency::solver::True);
-    assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &arc_consistency::solver::True);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &arc_consistency::solver::True);
+    assert(s.domain(v1).size() == 1 && *s.domain(v1).begin() == &arc_consistency::solver::True);
 }
 
 void test2()
@@ -70,8 +70,8 @@ void test2()
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &a);
-    assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &a);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &a);
+    assert(s.domain(v1).size() == 1 && *s.domain(v1).begin() == &a);
 }
 
 void test3()
@@ -98,23 +98,23 @@ void test3()
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &a);
-    assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &a);
-    assert(s.domain(v2).size() == 1 && &s.domain(v2).begin()->get() == &a);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &a);
+    assert(s.domain(v1).size() == 1 && *s.domain(v1).begin() == &a);
+    assert(s.domain(v2).size() == 1 && *s.domain(v2).begin() == &a);
     s.retract(c1);
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &a);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &a);
     assert(s.domain(v1).size() == 3);
     assert(s.domain(v2).size() == 3);
     s.add_constraint(s.new_assign(v2, b));
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &a);
-    assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &b);
-    assert(s.domain(v2).size() == 1 && &s.domain(v2).begin()->get() == &b);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &a);
+    assert(s.domain(v1).size() == 1 && *s.domain(v1).begin() == &b);
+    assert(s.domain(v2).size() == 1 && *s.domain(v2).begin() == &b);
 }
 
 void test4()
@@ -140,9 +140,9 @@ void test4()
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &a);
-    assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &b);
-    assert(s.domain(v2).size() == 1 && &s.domain(v2).begin()->get() == &a);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &a);
+    assert(s.domain(v1).size() == 1 && *s.domain(v1).begin() == &b);
+    assert(s.domain(v2).size() == 1 && *s.domain(v2).begin() == &a);
     s.add_constraint(s.new_forbid(v2, a));
     prop = s.propagate();
     assert(!prop);
@@ -151,9 +151,9 @@ void test4()
     prop = s.propagate();
     assert(prop);
     LOG_DEBUG(arc_consistency::to_string(s));
-    assert(s.domain(v0).size() == 1 && &s.domain(v0).begin()->get() == &a);
-    assert(s.domain(v1).size() == 1 && &s.domain(v1).begin()->get() == &a);
-    assert(s.domain(v2).size() == 1 && &s.domain(v2).begin()->get() == &b);
+    assert(s.domain(v0).size() == 1 && *s.domain(v0).begin() == &a);
+    assert(s.domain(v1).size() == 1 && *s.domain(v1).begin() == &a);
+    assert(s.domain(v2).size() == 1 && *s.domain(v2).begin() == &b);
 }
 
 int main()
