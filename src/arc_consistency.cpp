@@ -79,6 +79,13 @@ namespace arc_consistency
         constraints.emplace_back(std::move(c));
         return ref;
     }
+    constraint &solver::new_imply(utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept
+    {
+        auto c = std::make_unique<imply>(*this, premise, prem_val, conclusion, conc_val);
+        auto &ref = *c;
+        constraints.emplace_back(std::move(c));
+        return ref;
+    }
     constraint &solver::new_assign(utils::var x, utils::enum_val &val) noexcept
     {
         auto c = std::make_unique<assign>(*this, x, val);
@@ -195,28 +202,34 @@ namespace arc_consistency
     std::string to_string(const solver &s, utils::var v) noexcept
     {
         std::string res = "v" + std::to_string(v);
-        if (std::all_of(s.dom.at(v).begin(), s.dom.at(v).end(), [](const utils::enum_val *val)
-                        { return dynamic_cast<const enum_val *>(val); }))
-            switch (s.dom.at(v).size())
+        switch (s.dom.at(v).size())
+        {
+        case 0:
+            res += " = ∅";
+            break;
+        case 1:
+            res += " = ";
+            res += to_string(**s.dom.at(v).begin());
+            break;
+        default:
+            res += " ∈ {";
+            for (auto it = s.dom.at(v).begin(); it != s.dom.at(v).end(); ++it)
             {
-            case 0:
-                res += " = ∅";
-                break;
-            case 1:
-                res += " = ";
-                res += dynamic_cast<const enum_val *>(*s.dom.at(v).begin()) ? dynamic_cast<const enum_val *>(*s.dom.at(v).begin())->to_string() : "<unknown>";
-                break;
-            default:
-                res += " ∈ {";
-                for (auto it = s.dom.at(v).begin(); it != s.dom.at(v).end(); ++it)
-                {
-                    res += dynamic_cast<const enum_val *>(*it) ? dynamic_cast<const enum_val *>(*it)->to_string() : "<unknown>";
-                    if (std::next(it) != s.dom.at(v).end())
-                        res += ", ";
-                }
-                res += "}";
-                break;
+                res += to_string(**it);
+                if (std::next(it) != s.dom.at(v).end())
+                    res += ", ";
             }
+            res += "}";
+            break;
+        }
         return res;
+    }
+
+    std::string to_string(const utils::enum_val &ev) noexcept
+    {
+        if (const auto *b_ev = dynamic_cast<const bool_val *>(&ev))
+            return b_ev->to_string();
+        else
+            return "<val>";
     }
 } // namespace arc_consistency

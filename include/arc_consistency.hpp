@@ -127,6 +127,13 @@ namespace arc_consistency
      */
     [[nodiscard]] constraint &new_distinct(utils::var x, utils::var y) noexcept;
     /**
+     * @brief Creates a new implication constraint.
+     *
+     * The constraint enforces that when `premise` is assigned `prem_val`,
+     * `conclusion` must take the value `conc_val`.
+     */
+    [[nodiscard]] constraint &new_imply(utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept;
+    /**
      * @brief Creates a new assign constraint.
      *
      * This function creates a new assign constraint that assigns a specific value to a variable.
@@ -276,4 +283,5 @@ namespace arc_consistency
 
   [[nodiscard]] std::string to_string(const solver &s) noexcept;
   [[nodiscard]] std::string to_string(const solver &s, utils::var v) noexcept;
+  [[nodiscard]] std::string to_string(const utils::enum_val &ev) noexcept;
 } // namespace arc_consistency

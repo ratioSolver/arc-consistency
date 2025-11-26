@@ -46,6 +46,44 @@ namespace arc_consistency
 
     std::string forbid::to_string() const noexcept { return "v" + std::to_string(v) + " != " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"); }
 
+    imply::imply(solver &slv, utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept : constraint(slv), premise{premise}, prem_val{prem_val}, conclusion{conclusion}, conc_val{conc_val} {}
+
+    std::vector<utils::var> imply::scope() const noexcept { return {premise, conclusion}; }
+
+    bool imply::propagate(utils::var v) noexcept
+    {
+        if (v == premise)
+        { // If premise is assigned to prem_val, enforce conclusion to conc_val
+            auto &prem_dom = domain(premise);
+            if (prem_dom.size() == 1 && *prem_dom.begin() == &prem_val)
+            {
+                auto &conc_dom = domain(conclusion);
+                if (conc_dom.find(&conc_val) == conc_dom.end())
+                    return false; // Required value not available
+                std::vector<const utils::enum_val *> to_remove;
+                for (const auto &val : conc_dom)
+                    if (val != &conc_val)
+                        to_remove.push_back(val);
+                for (const auto &val : to_remove)
+                    if (!remove(conclusion, *val))
+                        return false; // Domain wipeout
+            }
+        }
+        else if (v == conclusion)
+        { // If conclusion cannot be conc_val, remove prem_val from premise
+            auto &conc_dom = domain(conclusion);
+            if (conc_dom.find(&conc_val) == conc_dom.end())
+            {
+                auto &prem_dom = domain(premise);
+                if (prem_dom.find(&prem_val) != prem_dom.end())
+                    return remove(premise, prem_val);
+            }
+        }
+        return true;
+    }
+
+    std::string imply::to_string() const noexcept { return "v" + std::to_string(premise) + " = " + arc_consistency::to_string(prem_val) + " => v" + std::to_string(conclusion) + " = " + arc_consistency::to_string(conc_val); }
+
     clause::clause(solver &slv, std::vector<utils::lit> &&lits) noexcept : constraint(slv), lits{std::move(lits)} {}
 
     std::vector<utils::var> clause::scope() const noexcept

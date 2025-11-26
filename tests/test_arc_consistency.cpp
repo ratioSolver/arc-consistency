@@ -156,6 +156,44 @@ void test4()
     assert(s.domain(v2).size() == 1 && *s.domain(v2).begin() == &b);
 }
 
+void test5()
+{
+    arc_consistency::solver s;
+    const auto premise = s.new_sat();
+    const auto conclusion = s.new_sat();
+    s.add_constraint(s.new_imply(premise, arc_consistency::solver::True, conclusion, arc_consistency::solver::False));
+    auto prop = s.propagate();
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+    s.add_constraint(s.new_assign(premise, arc_consistency::solver::True));
+    prop = s.propagate();
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+    assert(s.domain(premise).size() == 1 && *s.domain(premise).begin() == &arc_consistency::solver::True);
+    assert(s.domain(conclusion).size() == 1 && *s.domain(conclusion).begin() == &arc_consistency::solver::False);
+}
+
+void test6()
+{
+    arc_consistency::solver s;
+    const auto premise = s.new_sat();
+    const auto conclusion = s.new_sat();
+    s.add_constraint(s.new_imply(premise, arc_consistency::solver::True, conclusion, arc_consistency::solver::True));
+    auto prop = s.propagate();
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+    s.add_constraint(s.new_forbid(conclusion, arc_consistency::solver::True));
+    prop = s.propagate();
+    assert(prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+    assert(s.domain(conclusion).size() == 1 && *s.domain(conclusion).begin() == &arc_consistency::solver::False);
+    assert(s.domain(premise).size() == 1 && *s.domain(premise).begin() == &arc_consistency::solver::False);
+    s.add_constraint(s.new_assign(premise, arc_consistency::solver::True));
+    prop = s.propagate();
+    assert(!prop);
+    LOG_DEBUG(arc_consistency::to_string(s));
+}
+
 int main()
 {
     test0();
@@ -163,6 +201,8 @@ int main()
     test2();
     test3();
     test4();
+    test5();
+    test6();
 
     return 0;
 }

@@ -60,6 +60,23 @@ namespace arc_consistency
     const utils::enum_val &val;
   };
 
+  class imply final : public constraint
+  {
+  public:
+    imply(solver &slv, utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept;
+
+    std::vector<utils::var> scope() const noexcept override;
+    bool propagate(utils::var v) noexcept override;
+
+    std::string to_string() const noexcept override;
+
+  private:
+    const utils::var premise;
+    const utils::enum_val &prem_val;
+    const utils::var conclusion;
+    const utils::enum_val &conc_val;
+  };
+
   class clause final : public constraint
   {
   public:
