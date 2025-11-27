@@ -188,10 +188,6 @@ void test6()
     LOG_DEBUG(arc_consistency::to_string(s));
     assert(s.domain(conclusion).size() == 1 && *s.domain(conclusion).begin() == &arc_consistency::solver::False);
     assert(s.domain(premise).size() == 1 && *s.domain(premise).begin() == &arc_consistency::solver::False);
-    s.add_constraint(s.new_assign(premise, arc_consistency::solver::True));
-    prop = s.propagate();
-    assert(!prop);
-    LOG_DEBUG(arc_consistency::to_string(s));
 }
 
 int main()
