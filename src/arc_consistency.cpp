@@ -88,6 +88,7 @@ namespace arc_consistency
     }
     constraint &solver::new_assign(utils::var x, utils::enum_val &val) noexcept
     {
+        assert(dom.at(x).count(&val));
         auto c = std::make_unique<assign>(*this, x, val);
         auto &ref = *c;
         constraints.emplace_back(std::move(c));
@@ -95,6 +96,7 @@ namespace arc_consistency
     }
     constraint &solver::new_forbid(utils::var x, utils::enum_val &val) noexcept
     {
+        assert(init_domain.at(x).count(&val));
         auto c = std::make_unique<forbid>(*this, x, val);
         auto &ref = *c;
         constraints.emplace_back(std::move(c));
