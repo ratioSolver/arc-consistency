@@ -31,7 +31,7 @@ namespace arc_consistency
         return true;
     }
 
-    std::string assign::to_string() const noexcept { return "v" + std::to_string(v) + " -> " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"); }
+    std::string assign::to_string() const noexcept { return "v" + std::to_string(v) + " -> " + val.to_string(); }
 
     forbid::forbid(solver &slv, utils::var v, utils::enum_val &val) noexcept : constraint(slv), v{v}, val{val} {}
 
@@ -44,7 +44,7 @@ namespace arc_consistency
         return remove(v, val);
     }
 
-    std::string forbid::to_string() const noexcept { return "v" + std::to_string(v) + " != " + (dynamic_cast<const enum_val *>(&val) ? static_cast<const enum_val &>(val).to_string() : "<unknown>"); }
+    std::string forbid::to_string() const noexcept { return "v" + std::to_string(v) + " != " + val.to_string(); }
 
     imply::imply(solver &slv, utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept : constraint(slv), premise{premise}, prem_val{prem_val}, conclusion{conclusion}, conc_val{conc_val} {}
 
@@ -82,7 +82,7 @@ namespace arc_consistency
         return true;
     }
 
-    std::string imply::to_string() const noexcept { return "v" + std::to_string(premise) + " = " + arc_consistency::to_string(prem_val) + " => v" + std::to_string(conclusion) + " = " + arc_consistency::to_string(conc_val); }
+    std::string imply::to_string() const noexcept { return "v" + std::to_string(premise) + " = " + prem_val.to_string() + " => v" + std::to_string(conclusion) + " = " + conc_val.to_string(); }
 
     clause::clause(solver &slv, std::vector<utils::lit> &&lits) noexcept : constraint(slv), lits{std::move(lits)} {}
 

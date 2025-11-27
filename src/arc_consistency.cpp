@@ -211,13 +211,13 @@ namespace arc_consistency
             break;
         case 1:
             res += " = ";
-            res += to_string(**s.dom.at(v).begin());
+            res += (*s.dom.at(v).begin())->to_string();
             break;
         default:
             res += " ∈ {";
             for (auto it = s.dom.at(v).begin(); it != s.dom.at(v).end(); ++it)
             {
-                res += to_string(**it);
+                res += (*it)->to_string();
                 if (std::next(it) != s.dom.at(v).end())
                     res += ", ";
             }
@@ -225,13 +225,5 @@ namespace arc_consistency
             break;
         }
         return res;
-    }
-
-    std::string to_string(const utils::enum_val &ev) noexcept
-    {
-        if (const auto *b_ev = dynamic_cast<const bool_val *>(&ev))
-            return b_ev->to_string();
-        else
-            return "<val>";
     }
 } // namespace arc_consistency

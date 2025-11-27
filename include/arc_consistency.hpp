@@ -10,15 +10,7 @@
 
 namespace arc_consistency
 {
-  class enum_val : public utils::enum_val
-  {
-  public:
-    virtual ~enum_val() = default;
-
-    virtual std::string to_string() const = 0;
-  };
-
-  class bool_val : public enum_val
+  class bool_val : public utils::enum_val
   {
   public:
     static bool_val True;
@@ -283,5 +275,4 @@ namespace arc_consistency
 
   [[nodiscard]] std::string to_string(const solver &s) noexcept;
   [[nodiscard]] std::string to_string(const solver &s, utils::var v) noexcept;
-  [[nodiscard]] std::string to_string(const utils::enum_val &ev) noexcept;
 } // namespace arc_consistency

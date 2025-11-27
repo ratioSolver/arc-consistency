@@ -2,7 +2,7 @@
 #include "logging.hpp"
 #include <cassert>
 
-class test_enum_val : public arc_consistency::enum_val
+class test_enum_val : public utils::enum_val
 {
 public:
     explicit test_enum_val(std::string name) : name(std::move(name)) {}
