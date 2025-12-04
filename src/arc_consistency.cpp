@@ -79,14 +79,14 @@ namespace arc_consistency
         constraints.emplace_back(std::move(c));
         return ref;
     }
-    constraint &solver::new_imply(utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept
+    constraint &solver::new_imply(utils::var premise, const utils::enum_val &prem_val, utils::var conclusion, const utils::enum_val &conc_val) noexcept
     {
         auto c = std::make_unique<imply>(*this, premise, prem_val, conclusion, conc_val);
         auto &ref = *c;
         constraints.emplace_back(std::move(c));
         return ref;
     }
-    constraint &solver::new_assign(utils::var x, utils::enum_val &val) noexcept
+    constraint &solver::new_assign(utils::var x, const utils::enum_val &val) noexcept
     {
         assert(dom.at(x).count(&val));
         auto c = std::make_unique<assign>(*this, x, val);
@@ -94,7 +94,7 @@ namespace arc_consistency
         constraints.emplace_back(std::move(c));
         return ref;
     }
-    constraint &solver::new_forbid(utils::var x, utils::enum_val &val) noexcept
+    constraint &solver::new_forbid(utils::var x, const utils::enum_val &val) noexcept
     {
         assert(init_domain.at(x).count(&val));
         auto c = std::make_unique<forbid>(*this, x, val);

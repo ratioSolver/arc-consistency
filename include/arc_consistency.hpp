@@ -124,7 +124,7 @@ namespace arc_consistency
      * The constraint enforces that when `premise` is assigned `prem_val`,
      * `conclusion` must take the value `conc_val`.
      */
-    [[nodiscard]] constraint &new_imply(utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept;
+    [[nodiscard]] constraint &new_imply(utils::var premise, const utils::enum_val &prem_val, utils::var conclusion, const utils::enum_val &conc_val) noexcept;
     /**
      * @brief Creates a new assign constraint.
      *
@@ -134,7 +134,7 @@ namespace arc_consistency
      * @param val The value to assign to the variable.
      * @return constraint& A reference to the newly created assign constraint.
      */
-    [[nodiscard]] constraint &new_assign(utils::var x, utils::enum_val &val) noexcept;
+    [[nodiscard]] constraint &new_assign(utils::var x, const utils::enum_val &val) noexcept;
     /**
      * @brief Creates a new forbid constraint.
      *
@@ -144,7 +144,7 @@ namespace arc_consistency
      * @param val The value to forbid for the variable.
      * @return constraint& A reference to the newly created forbid constraint.
      */
-    [[nodiscard]] constraint &new_forbid(utils::var x, utils::enum_val &val) noexcept;
+    [[nodiscard]] constraint &new_forbid(utils::var x, const utils::enum_val &val) noexcept;
 
     /**
      * @brief Adds a constraint to the solver.

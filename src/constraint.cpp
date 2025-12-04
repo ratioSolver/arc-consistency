@@ -12,7 +12,7 @@ namespace arc_consistency
         return slv.dom[v];
     }
 
-    assign::assign(solver &slv, utils::var v, utils::enum_val &val) noexcept : constraint(slv), v{v}, val{val} {}
+    assign::assign(solver &slv, utils::var v, const utils::enum_val &val) noexcept : constraint(slv), v{v}, val{val} {}
 
     std::vector<utils::var> assign::scope() const noexcept { return {v}; }
 
@@ -33,7 +33,7 @@ namespace arc_consistency
 
     std::string assign::to_string() const noexcept { return "v" + std::to_string(v) + " -> " + val.to_string(); }
 
-    forbid::forbid(solver &slv, utils::var v, utils::enum_val &val) noexcept : constraint(slv), v{v}, val{val} {}
+    forbid::forbid(solver &slv, utils::var v, const utils::enum_val &val) noexcept : constraint(slv), v{v}, val{val} {}
 
     std::vector<utils::var> forbid::scope() const noexcept { return {v}; }
 
@@ -46,7 +46,7 @@ namespace arc_consistency
 
     std::string forbid::to_string() const noexcept { return "v" + std::to_string(v) + " != " + val.to_string(); }
 
-    imply::imply(solver &slv, utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept : constraint(slv), premise{premise}, prem_val{prem_val}, conclusion{conclusion}, conc_val{conc_val} {}
+    imply::imply(solver &slv, utils::var premise, const utils::enum_val &prem_val, utils::var conclusion, const utils::enum_val &conc_val) noexcept : constraint(slv), premise{premise}, prem_val{prem_val}, conclusion{conclusion}, conc_val{conc_val} {}
 
     std::vector<utils::var> imply::scope() const noexcept { return {premise, conclusion}; }
 

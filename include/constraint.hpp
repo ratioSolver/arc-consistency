@@ -33,7 +33,7 @@ namespace arc_consistency
   class assign final : public constraint
   {
   public:
-    assign(solver &slv, utils::var v, utils::enum_val &val) noexcept;
+    assign(solver &slv, utils::var v, const utils::enum_val &val) noexcept;
 
     std::vector<utils::var> scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
@@ -48,7 +48,7 @@ namespace arc_consistency
   class forbid final : public constraint
   {
   public:
-    forbid(solver &slv, utils::var v, utils::enum_val &val) noexcept;
+    forbid(solver &slv, utils::var v, const utils::enum_val &val) noexcept;
 
     std::vector<utils::var> scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
@@ -63,7 +63,7 @@ namespace arc_consistency
   class imply final : public constraint
   {
   public:
-    imply(solver &slv, utils::var premise, utils::enum_val &prem_val, utils::var conclusion, utils::enum_val &conc_val) noexcept;
+    imply(solver &slv, utils::var premise, const utils::enum_val &prem_val, utils::var conclusion, const utils::enum_val &conc_val) noexcept;
 
     std::vector<utils::var> scope() const noexcept override;
     bool propagate(utils::var v) noexcept override;
