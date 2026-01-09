@@ -180,16 +180,6 @@ namespace arc_consistency
         return true;
     }
 
-#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
-    void solver::add_listener(listener &l) noexcept { listeners.insert(&l); }
-    void solver::remove_listener(listener &l) noexcept
-    {
-        for (const auto &v : l.listened_vars)
-            listening[v].erase(&l);
-        listeners.erase(&l);
-    }
-#endif
-
     std::string to_string(const solver &s) noexcept
     {
         std::string res = "Solver State:\n";

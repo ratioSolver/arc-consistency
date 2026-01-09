@@ -209,26 +209,6 @@ namespace arc_consistency
      */
     [[nodiscard]] bool allows(utils::var v, const utils::enum_val &val) const noexcept;
 
-#ifdef ARCCONSISTENCY_ENABLE_LISTENERS
-  private:
-    /**
-     * @brief Adds a listener to the solver.
-     *
-     * This function registers a listener that will be notified of domain changes.
-     *
-     * @param l A shared pointer to the listener to be added.
-     */
-    void add_listener(listener &l) noexcept;
-    /**
-     * @brief Removes a listener from the solver.
-     *
-     * This function unregisters a listener from receiving domain change notifications.
-     *
-     * @param l A shared pointer to the listener to be removed.
-     */
-    void remove_listener(listener &l) noexcept;
-#endif
-
     friend std::string to_string(const solver &s) noexcept;
     friend std::string to_string(const solver &s, utils::var v) noexcept;
 
@@ -254,11 +234,20 @@ namespace arc_consistency
     friend class solver;
 
   public:
-    explicit listener(solver &slv) noexcept : slv(slv) { slv.add_listener(*this); }
-    virtual ~listener() noexcept { slv.remove_listener(*this); }
+    explicit listener(solver &slv) noexcept : slv(slv) { slv.listeners.insert(this); }
+    virtual ~listener() noexcept
+    {
+      for (const auto &v : listened_vars)
+      {
+        slv.listening[v].erase(this);
+        if (slv.listening[v].empty())
+          slv.listening.erase(v);
+      }
+      slv.listeners.erase(this);
+    }
 
   protected:
-    void listen_to(utils::var v) noexcept
+    void listen(utils::var v) noexcept
     {
       if (listened_vars.insert(v).second)
         slv.listening[v].insert(this);
